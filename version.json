@@ -1,5 +1,5 @@
 {
-  "web": "1.0.1",
+  "web": "1.0.2",
   "app": "1.0.0",
   "web_files": [
     "licitafauna.html",
@@ -7,5 +7,5 @@
     "ungm_unspsc_catalog.json"
   ],
   "dmg_url": "https://github.com/cristobalbalbi-RC/licitafauna/releases/latest",
-  "notas": "Versión inicial."
+  "notas": "Indicador de versión en esquina inferior derecha."
 }

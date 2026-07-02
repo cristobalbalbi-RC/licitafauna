@@ -4747,6 +4747,22 @@ async function enviarASheets(fila, btn){
 }
 function enviarMP(l, btn){ enviarASheets(_filaMP(l), btn); }
 function enviarUNGM(l, btn){ enviarASheets(_filaUNGM(l), btn); }
+
+// ── Indicador de versión (esquina inferior derecha) ──────────
+(function(){
+  var badge = document.createElement('div');
+  badge.id = 'version-badge';
+  badge.style.cssText = 'position:fixed;bottom:8px;right:10px;z-index:9999;'
+    + 'font:11px/1.4 system-ui,-apple-system,sans-serif;color:#6E6E33;'
+    + 'background:rgba(255,255,255,.85);padding:2px 8px;border-radius:10px;'
+    + 'border:1px solid rgba(110,110,51,.25);pointer-events:none;';
+  badge.textContent = 'v…';
+  document.body.appendChild(badge);
+  fetch('version.json?_=' + Date.now())
+    .then(function(r){ return r.json(); })
+    .then(function(v){ badge.textContent = 'v' + (v.web || '?'); })
+    .catch(function(){ badge.textContent = ''; });
+})();
 </script>
 </body>
 </html>
