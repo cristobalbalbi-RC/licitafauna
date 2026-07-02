@@ -1,0 +1,11 @@
+{
+  "web": "1.0.0",
+  "app": "1.0.0",
+  "web_files": [
+    "licitafauna.html",
+    "categorias_exploradas.json",
+    "ungm_unspsc_catalog.json"
+  ],
+  "dmg_url": "https://github.com/cristobalbalbi-RC/licitafauna/releases/latest",
+  "notas": "Versión inicial."
+}
