@@ -4760,7 +4760,7 @@ function enviarUNGM(l, btn){ enviarASheets(_filaUNGM(l), btn); }
   document.body.appendChild(badge);
   fetch('version.json?_=' + Date.now())
     .then(function(r){ return r.json(); })
-    .then(function(v){ badge.textContent = 'v' + (v.web || '?'); })
+    .then(function(v){ badge.textContent = 'v' + (v.app || '?'); })
     .catch(function(){ badge.textContent = ''; });
 })();
 </script>
