@@ -1,0 +1,25 @@
+{
+  "fuente": "mp",
+  "query": "estado=activas",
+  "cacheado_en": 1783052546.3806107,
+  "cacheado_por": "prueba-fase-A",
+  "payload": {
+    "Cantidad": 2,
+    "FechaCreacion": "2026-07-03",
+    "Version": "v1",
+    "Listado": [
+      {
+        "CodigoExterno": "CACHE-TEST-001",
+        "Nombre": "⚡ LICITACIÓN DE PRUEBA DESDE CACHÉ COMPARTIDO",
+        "CodigoEstado": 5,
+        "FechaCierre": "2026-08-01T15:00:00"
+      },
+      {
+        "CodigoExterno": "CACHE-TEST-002",
+        "Nombre": "⚡ Segunda licitación de prueba (caché)",
+        "CodigoEstado": 5,
+        "FechaCierre": "2026-08-05T15:00:00"
+      }
+    ]
+  }
+}
