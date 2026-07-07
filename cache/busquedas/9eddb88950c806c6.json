@@ -1,10 +1,10 @@
 {
   "fuente": "mp",
   "query": "codigo=1574-23-LE26",
-  "cacheado_en": 1783090123.405787,
+  "cacheado_en": 1783430957.2143092,
   "payload": {
     "Cantidad": 1,
-    "FechaCreacion": "2026-07-03T14:48:43.3748415Z",
+    "FechaCreacion": "2026-07-07T13:29:17.1885464Z",
     "Version": "v1",
     "Listado": [
       {
@@ -28,7 +28,7 @@
           "NombreUsuario": "CLAUDIO VICENCIO COLLANTES",
           "CargoUsuario": "Encargado Sección de Abastecimiento"
         },
-        "DiasCierreLicitacion": "12",
+        "DiasCierreLicitacion": "8",
         "Informada": 0,
         "CodigoTipo": 1,
         "Tipo": "LE",
