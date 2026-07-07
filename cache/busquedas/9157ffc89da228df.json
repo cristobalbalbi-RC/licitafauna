@@ -1,10 +1,10 @@
 {
   "fuente": "mp",
   "query": "codigo=1017312-12-LR26",
-  "cacheado_en": 1783055638.0945659,
+  "cacheado_en": 1783430693.100075,
   "payload": {
     "Cantidad": 1,
-    "FechaCreacion": "2026-07-03T05:13:58.1729331Z",
+    "FechaCreacion": "2026-07-07T13:24:53.203946Z",
     "Version": "v1",
     "Listado": [
       {
@@ -28,7 +28,7 @@
           "NombreUsuario": "José Miguel DÍAZ Medina",
           "CargoUsuario": "Supervisor"
         },
-        "DiasCierreLicitacion": "45",
+        "DiasCierreLicitacion": "41",
         "Informada": 0,
         "CodigoTipo": 1,
         "Tipo": "LR",
@@ -41,7 +41,7 @@
         "JustificacionPublicidad": "",
         "Contrato": "0",
         "Obras": "0",
-        "CantidadReclamos": 2565,
+        "CantidadReclamos": 2567,
         "Fechas": {
           "FechaCreacion": "2026-07-02T00:00:00",
           "FechaCierre": "2026-08-17T16:00:00",
