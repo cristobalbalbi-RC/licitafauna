@@ -1,10 +1,10 @@
 {
   "fuente": "mp",
   "query": "codigo=1591-1-LR26",
-  "cacheado_en": 1783090124.8946261,
+  "cacheado_en": 1783430960.1027572,
   "payload": {
     "Cantidad": 1,
-    "FechaCreacion": "2026-07-03T14:48:44.9529432Z",
+    "FechaCreacion": "2026-07-07T13:29:20.1260461Z",
     "Version": "v1",
     "Listado": [
       {
@@ -28,7 +28,7 @@
           "NombreUsuario": "Nicolás Cerda Espinoza",
           "CargoUsuario": "Encargado Unidad de Administración"
         },
-        "DiasCierreLicitacion": "31",
+        "DiasCierreLicitacion": "27",
         "Informada": 0,
         "CodigoTipo": 1,
         "Tipo": "LR",
