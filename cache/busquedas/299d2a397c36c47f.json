@@ -1,10 +1,10 @@
 {
   "fuente": "mp",
   "query": "codigo=1459-15-LP26",
-  "cacheado_en": 1783083500.734117,
+  "cacheado_en": 1783430926.1562781,
   "payload": {
     "Cantidad": 1,
-    "FechaCreacion": "2026-07-03T12:58:20.8531101Z",
+    "FechaCreacion": "2026-07-07T13:28:46.1954263Z",
     "Version": "v1",
     "Listado": [
       {
@@ -28,7 +28,7 @@
           "NombreUsuario": "Janet del Carmen Vergara Diaz",
           "CargoUsuario": "Ejecutiva de Compras"
         },
-        "DiasCierreLicitacion": "10",
+        "DiasCierreLicitacion": "6",
         "Informada": 0,
         "CodigoTipo": 1,
         "Tipo": "LP",
