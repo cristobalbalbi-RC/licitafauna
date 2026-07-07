@@ -1,10 +1,10 @@
 {
   "fuente": "mp",
   "query": "estado=activas",
-  "cacheado_en": 1783430642.212814,
+  "cacheado_en": 1783430657.437095,
   "payload": {
-    "Cantidad": 3851,
-    "FechaCreacion": "2026-07-07T13:24:02.2507856Z",
+    "Cantidad": 3852,
+    "FechaCreacion": "2026-07-07T13:24:17.2664248Z",
     "Version": "v1",
     "Listado": [
       {
@@ -19350,6 +19350,12 @@
         "Nombre": "OBSERVACIÓN DE LA NSCA DE CUENCA RÍO MAIPO 26-27",
         "CodigoEstado": 5,
         "FechaCierre": "2026-07-13T15:30:00"
+      },
+      {
+        "CodigoExterno": "611136-1-LE26",
+        "Nombre": "Implementación Estrategia Educ. Cambio Climático",
+        "CodigoEstado": 5,
+        "FechaCierre": "2026-07-17T15:30:00"
       },
       {
         "CodigoExterno": "611669-12-CO26",
