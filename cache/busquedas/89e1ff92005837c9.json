@@ -1,10 +1,10 @@
 {
   "fuente": "mp",
   "query": "codigo=1293138-7-LE26",
-  "cacheado_en": 1783063561.14852,
+  "cacheado_en": 1783430895.6300402,
   "payload": {
     "Cantidad": 1,
-    "FechaCreacion": "2026-07-03T07:26:01.2673415Z",
+    "FechaCreacion": "2026-07-07T13:28:15.6690539Z",
     "Version": "v1",
     "Listado": [
       {
@@ -28,7 +28,7 @@
           "NombreUsuario": "SERGIO ALBERTO CARVAJAL VERA",
           "CargoUsuario": "EJECUTIVO DE COMPRA"
         },
-        "DiasCierreLicitacion": "10",
+        "DiasCierreLicitacion": "6",
         "Informada": 0,
         "CodigoTipo": 1,
         "Tipo": "LE",
