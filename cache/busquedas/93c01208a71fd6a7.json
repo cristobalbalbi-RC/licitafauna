@@ -1,10 +1,10 @@
 {
   "fuente": "mp",
   "query": "codigo=1350296-69-LP26",
-  "cacheado_en": 1783064706.286564,
+  "cacheado_en": 1783430901.27598,
   "payload": {
     "Cantidad": 1,
-    "FechaCreacion": "2026-07-03T07:45:06.3589384Z",
+    "FechaCreacion": "2026-07-07T13:28:21.266622Z",
     "Version": "v1",
     "Listado": [
       {
@@ -28,7 +28,7 @@
           "NombreUsuario": "MURIEL DAZA MORALES",
           "CargoUsuario": "PROFESIONAL ABASTECIMIENTO"
         },
-        "DiasCierreLicitacion": "21",
+        "DiasCierreLicitacion": "17",
         "Informada": 0,
         "CodigoTipo": 1,
         "Tipo": "LP",
