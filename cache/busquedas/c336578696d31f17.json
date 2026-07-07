@@ -1,10 +1,10 @@
 {
   "fuente": "mp",
   "query": "codigo=2393-14-L126",
-  "cacheado_en": 1783090606.151977,
+  "cacheado_en": 1783431136.260566,
   "payload": {
     "Cantidad": 1,
-    "FechaCreacion": "2026-07-03T14:56:46.2025193Z",
+    "FechaCreacion": "2026-07-07T13:32:16.2820798Z",
     "Version": "v1",
     "Listado": [
       {
@@ -28,7 +28,7 @@
           "NombreUsuario": "Dannae Elgueta Gomez",
           "CargoUsuario": "Apoyo administrativo adquisiciones"
         },
-        "DiasCierreLicitacion": "6",
+        "DiasCierreLicitacion": "2",
         "Informada": 0,
         "CodigoTipo": 1,
         "Tipo": "L1",
