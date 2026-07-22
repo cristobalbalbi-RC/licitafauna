@@ -1,5 +1,5 @@
 {
-  "actualizado": 1784740896276,
+  "actualizado": 1784740976834,
   "lics": {
     "1301-1-LE26": {
       "robles": true,
@@ -15320,6 +15320,506 @@
       "robles": false,
       "estado": "Publicada",
       "ts": 1784740895115
+    },
+    "823-4-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740896617
+    },
+    "825-4-O126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740897946
+    },
+    "826-10-O126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740898323
+    },
+    "828-2-O126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740898973
+    },
+    "830715-10-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740899806
+    },
+    "830715-9-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740900259
+    },
+    "834259-42-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740901830
+    },
+    "835727-20-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740902402
+    },
+    "835727-21-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740902976
+    },
+    "837-52-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740904705
+    },
+    "837-61-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740905522
+    },
+    "837-64-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740906074
+    },
+    "837-66-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740906628
+    },
+    "837-67-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740907077
+    },
+    "837-70-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740907737
+    },
+    "837-75-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740909258
+    },
+    "837-77-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740909698
+    },
+    "837-81-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740910273
+    },
+    "838099-3-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740911085
+    },
+    "838103-5-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740911457
+    },
+    "838108-6-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740912419
+    },
+    "839186-5-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740913142
+    },
+    "840405-10-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740913920
+    },
+    "848-23-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740914990
+    },
+    "852-26-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740915361
+    },
+    "85-23-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740915816
+    },
+    "85-25-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740916584
+    },
+    "853-18-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740917913
+    },
+    "853-20-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740918384
+    },
+    "855-14-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740918821
+    },
+    "856-21-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740919194
+    },
+    "858-49-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740920968
+    },
+    "858-51-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740921599
+    },
+    "858-52-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740921995
+    },
+    "867990-57-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740923650
+    },
+    "868-15-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740924264
+    },
+    "869591-8-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740924904
+    },
+    "881-9-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740925643
+    },
+    "883-22-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740926218
+    },
+    "885-69-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740926607
+    },
+    "886954-164-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740928321
+    },
+    "886954-185-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740928897
+    },
+    "886954-217-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740929869
+    },
+    "886954-218-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740930301
+    },
+    "886954-224-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740931433
+    },
+    "886954-229-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740931803
+    },
+    "894863-11-O126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740932985
+    },
+    "898-131-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740934605
+    },
+    "898-135-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740935217
+    },
+    "898-136-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740935937
+    },
+    "898-139-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740936509
+    },
+    "898-142-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740937486
+    },
+    "898-143-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740937889
+    },
+    "898-144-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740938258
+    },
+    "898-145-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740938698
+    },
+    "903031-8-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740940135
+    },
+    "903031-9-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740940685
+    },
+    "905-24-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740941399
+    },
+    "911089-3-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740942468
+    },
+    "915021-16-CO26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740943107
+    },
+    "918023-4-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740943480
+    },
+    "924-18-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740944897
+    },
+    "924-19-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740945349
+    },
+    "926-7-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740945953
+    },
+    "926-8-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740946586
+    },
+    "928-22-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740947249
+    },
+    "929-20-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740948018
+    },
+    "932163-17-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740948917
+    },
+    "932-20-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740949859
+    },
+    "934-9-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740950679
+    },
+    "935-14-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740951345
+    },
+    "937232-66-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740951974
+    },
+    "938-20-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740953654
+    },
+    "938-21-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740954263
+    },
+    "938614-42-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740954821
+    },
+    "938614-47-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740955201
+    },
+    "941739-10-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740955904
+    },
+    "941739-2-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740956454
+    },
+    "947750-15-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740957593
+    },
+    "947750-16-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740958669
+    },
+    "947750-17-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740959283
+    },
+    "947750-18-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740959649
+    },
+    "948-19-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740960090
+    },
+    "948354-109-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740961860
+    },
+    "948354-94-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740962272
+    },
+    "948354-96-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740963276
+    },
+    "948355-56-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740964509
+    },
+    "948355-58-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740966142
+    },
+    "948355-59-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740966537
+    },
+    "948356-112-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740967506
+    },
+    "948356-113-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740967956
+    },
+    "948356-114-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740968536
+    },
+    "948356-115-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740968988
+    },
+    "948356-120-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740970409
+    },
+    "948356-121-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740970784
+    },
+    "948806-87-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740971442
+    },
+    "949-6-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740972973
+    },
+    "951405-13-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740973722
+    },
+    "951405-2-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740974461
+    },
+    "953-14-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740975256
     }
   }
 }
