@@ -1256,6 +1256,72 @@ const CACHE_TTL_APRO =  7 * 86400000; //  7 días para aprobadas
 let cacheNoRobles = {};  // {CodigoExterno: timestamp}
 let cacheSiRobles = {};  // {CodigoExterno: {det:{...}, ts: timestamp}}
 
+// ── Libreta de clasificación COMPARTIDA (equipo, vía GitHub) ──────────
+// Índice permanente {codigo: {robles, estado, ts}} que todos comparten.
+// Lectura: raw de GitHub (instantáneo). Escritura: Apps Script (merge).
+const INDICE_RAW_URL   = 'https://raw.githubusercontent.com/cristobalbalbi-RC/licitafauna/main/cache/indice_clasificacion.json';
+const INDICE_WRITE_URL = 'https://script.google.com/macros/s/AKfycbxrmDdinWPDVG5E9n8dge6xjkmV6aPwQyzogvIhfqZbxxzVW0FzAm8VU8qe0-zmmLp6/exec';
+let nuevasClasificaciones = {};  // acumula lo clasificado en esta sesión para subir en lote
+
+// Baja la libreta compartida y precarga las clasificaciones del equipo.
+// Aditivo: complementa el caché local, no lo reemplaza.
+async function bajarIndiceCompartido() {
+  try {
+    const r = await fetch(INDICE_RAW_URL + '?_=' + Date.now(),
+      { signal: AbortSignal.timeout(8000) });
+    if (!r.ok) return;
+    const idx = await r.json();
+    const lics = (idx && idx.lics) || {};
+    let n = 0;
+    for (const cod in lics) {
+      const e = lics[cod];
+      if (e.robles === false && !(cod in cacheNoRobles)) { cacheNoRobles[cod] = e.ts || Date.now(); n++; }
+      else if (e.robles === true && !(cod in cacheSiRobles)) { cacheSiRobles[cod] = { det: e.det || {}, ts: e.ts || Date.now() }; n++; }
+    }
+    if (n) console.log(`📥 Índice compartido: +${n} clasificaciones del equipo`);
+  } catch (e) { /* sin conexión o sin índice aún: seguir con caché local */ }
+}
+
+// Sube en lote las clasificaciones nuevas de esta sesión (merge en GitHub).
+// Toma un snapshot y vacía el buffer ANTES de enviar, para no perder las que
+// lleguen durante el envío. Si falla, las devuelve al buffer para reintentar.
+let subiendoIndice = false;
+async function subirIndiceCompartido() {
+  if (subiendoIndice) return;                       // evitar envíos solapados
+  const lics = nuevasClasificaciones;
+  const n = Object.keys(lics).length;
+  if (!n) return;
+  subiendoIndice = true;
+  nuevasClasificaciones = {};                       // buffer limpio desde ya
+  try {
+    await fetch(INDICE_WRITE_URL, {
+      method: 'POST',
+      // text/plain evita el preflight CORS (Apps Script no responde OPTIONS).
+      // El Apps Script parsea el JSON del cuerpo igual.
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ tipo: 'indice', lics: lics })
+    });
+    console.log(`📤 Índice compartido: ${n} clasificaciones enviadas`);
+  } catch (e) {
+    // Falló: devolver al buffer para reintentar en el próximo lote.
+    Object.assign(nuevasClasificaciones, lics);
+    console.warn('Índice compartido: envío falló, se reintentará', e);
+  } finally {
+    subiendoIndice = false;
+  }
+}
+
+// Registra una clasificación para el lote compartido.
+// Sube automáticamente cada LOTE_SUBIDA para no perder trabajo si se
+// interrumpe la exploración (cierre de app, caída del server, etc.).
+const LOTE_SUBIDA = 100;
+function registrarClasificacion(cod, esRobles, estado) {
+  nuevasClasificaciones[cod] = { robles: !!esRobles, estado: estado || '', ts: Date.now() };
+  if (Object.keys(nuevasClasificaciones).length >= LOTE_SUBIDA) {
+    subirIndiceCompartido();   // parcial, en segundo plano
+  }
+}
+
 // ─── Keywords ambientales para colorear chips de categoría ────────────────
 const CAT_KW_AMBIENTAL = [
   'forestal','bosque','reforest','vivero','planta','árbol','arbol',
@@ -2399,12 +2465,15 @@ async function cargarDetalles() {
           indexarCategorias(l);
 
           // ── Guardar en caché según resultado UNSPSC ───────────
-          if (tieneUnspscPerfil(l)) {
+          const esRobles = tieneUnspscPerfil(l);
+          if (esRobles) {
             cacheSiRobles[cod] = { det, ts: Date.now() };
           } else {
             cacheNoRobles[cod] = Date.now();
             if (filtroUnspsc) { l._desc = true; }
           }
+          // Registrar para la libreta compartida del equipo (se sube en lote).
+          registrarClasificacion(cod, esRobles, l.Estado || l.CodigoEstado || '');
 
           if (scoreNuevo === 0 && !filtroUnspsc) { l._desc = true; }
 
@@ -2427,6 +2496,7 @@ async function cargarDetalles() {
   renderCards();
   guardarCacheProductos();    // guardar catálogo de categorías
   guardarCacheResultados();   // guardar aprobadas/descartadas
+  subirIndiceCompartido();    // + subir en lote a la libreta compartida del equipo
   const roblesCount    = licitaciones.filter(l => l._detalleOk && tieneUnspscPerfil(l)).length;
   const analizadasCount = licitaciones.filter(l => l._detalleOk).length;
   const cacheMsg = cacheHits > 0 ? ` (${cacheHits} del caché)` : '';
@@ -4604,6 +4674,7 @@ async function evaluarBID(codigo, btn, noticeId){
     cargarCacheLocal();         // categoriaIndex desde localStorage
     cargarCacheProductos();     // productoIndex + perfilProductosCods
     cargarCacheResultados();    // cacheNoRobles + cacheSiRobles
+    bajarIndiceCompartido();    // + libreta compartida del equipo (async, no bloquea)
   } catch(e) { /* silencioso */ }
 })();
 
