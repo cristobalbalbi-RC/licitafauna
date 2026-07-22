@@ -1,0 +1,26 @@
+# ── Secretos: NUNCA subir ───────────────────────────────────────
+# Los .gs de Apps Script llevan tokens y IDs de carpetas privadas.
+# Viven en la cuenta de Google, no en el repo.
+Codigo_WebApp_*.gs
+
+# ── Datos de sesión y caché local ───────────────────────────────
+# Perfil del navegador: cookies de sesión de Mercado Público.
+_mp_profile/
+# Caché desechable de evaluación: anexos descargados, pesa mucho.
+_cache_eval/
+__pycache__/
+*.pyc
+
+# ── Artefactos de compilación ───────────────────────────────────
+build-app/build/
+build-app/dist/
+build-app/LicitaFauna.app/
+*.dmg
+
+# ── Archivos de trabajo pesados ─────────────────────────────────
+*.xlsx
+.~lock.*#
+Excel trabajo/
+
+# ── macOS ───────────────────────────────────────────────────────
+.DS_Store
