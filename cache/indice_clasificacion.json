@@ -1,5 +1,5 @@
 {
-  "actualizado": 1784740976834,
+  "actualizado": 1784740988396,
   "lics": {
     "1301-1-LE26": {
       "robles": true,
@@ -15820,6 +15820,86 @@
       "robles": false,
       "estado": "Publicada",
       "ts": 1784740975256
+    },
+    "956-47-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740976001
+    },
+    "963423-7-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740976379
+    },
+    "963423-8-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740976859
+    },
+    "966131-39-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740977238
+    },
+    "966539-20-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740978420
+    },
+    "975-12-O126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740979218
+    },
+    "975-40-O126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740980275
+    },
+    "975-56-LS13": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740980650
+    },
+    "976-9-O126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740981233
+    },
+    "980313-26-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740982313
+    },
+    "985737-14-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740983172
+    },
+    "993-33-CO26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740983628
+    },
+    "993-35-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740984435
+    },
+    "996-22-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740984904
+    },
+    "997-28-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740985804
+    },
+    "998-35-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1784740986291
     }
   }
 }
