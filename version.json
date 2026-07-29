@@ -1,6 +1,6 @@
 {
   "web": "1.0.5",
-  "app": "1.0.5",
+  "app": "1.0.6",
   "web_files": [
     "licitafauna.html",
     "categorias_exploradas.json",
