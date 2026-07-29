@@ -1,5 +1,5 @@
 {
-  "actualizado": 1785353413685,
+  "actualizado": 1785353437880,
   "lics": {
     "1301-1-LE26": {
       "robles": true,
@@ -30860,6 +30860,96 @@
       "robles": false,
       "estado": "Publicada",
       "ts": 1785353412249
+    },
+    "838100-5-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353413042
+    },
+    "859378-7-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353415024
+    },
+    "879-10-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353415817
+    },
+    "881-11-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353416604
+    },
+    "886954-237-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353417405
+    },
+    "886954-246-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353418192
+    },
+    "886954-249-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353418970
+    },
+    "886954-251-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353420815
+    },
+    "886954-252-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353421723
+    },
+    "886954-257-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353423716
+    },
+    "889473-41-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353424930
+    },
+    "921831-20-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353426162
+    },
+    "928-23-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353427493
+    },
+    "934-13-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353429337
+    },
+    "938-22-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353430329
+    },
+    "947621-2-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353431381
+    },
+    "948354-116-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353433228
+    },
+    "948354-117-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1785353434150
     }
   }
 }
