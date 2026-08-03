@@ -4587,6 +4587,7 @@ function renderCardBIOFIN(l){
       <div class="card-acciones">
         <a href="${link}" target="_blank" class="btn-sm">🔗 Ver ficha del fondo</a>
         ${l._slug ? `<button class="btn-sm" onclick="evaluarBIOFIN('${l.CodigoExterno}', this, '${l._slug}')">🧠 Evaluar</button>` : ''}
+        ${botonSheetBIOFIN(l)}
         <button class="btn-sm danger" onclick="descartarBIOFIN('${l.CodigoExterno}')">🚫 Descartar</button>
       </div>
     </div>
@@ -4820,8 +4821,47 @@ async function enviarASheets(fila, btn){
     if(btn){ btn.disabled=false; btn.textContent=txt; }
   }
 }
+function _filaBIOFIN(l){
+  const clean = v => (v==null?'':String(v)).replace(/[\t\r\n]+/g,' ').trim();
+  const c = new Array(36).fill('');
+  c[3]=new Date().toISOString().slice(0,10);           // Fecha detección
+  c[5]='BIOFIN · FIRE';                                // Fuente / Portal
+  c[6]=clean('biofin-'+(l._slug||''));                 // ID externo (slug)
+  c[7]=clean(l.Nombre);                                // Título
+  // Descripción: se arma con los metadatos del fondo (no trae texto libre).
+  c[8]=clean([l._tipo && ('Instrumento: '+l._tipo),
+              l._tamano && ('Tamaño: '+l._tamano),
+              l._ecosistema && ('Ecosistema: '+l._ecosistema),
+              l._categorias && ('Categorías: '+l._categorias)]
+             .filter(Boolean).join(' · '));
+  c[9]=clean(l._org || 'BIOFIN · FIRE');               // Contraparte
+  c[10]='Fondo / Financista';                          // Tipo de entidad
+  c[12]=clean(l._paises);                              // Región / países elegibles
+  // Sin monto fijo ni fecha de cierre: son ventanillas, no licitaciones.
+  c[17]='';                                            // Fecha cierre → vacía
+  c[20]=clean(l._link);                                // Enlace a la ficha
+  c[21]=clean(l._score);                               // Score
+  return c;
+}
 function enviarMP(l, btn){ enviarASheets(_filaMP(l), btn); }
 function enviarUNGM(l, btn){ enviarASheets(_filaUNGM(l), btn); }
+function enviarBIOFIN(l, btn){ enviarASheets(_filaBIOFIN(l), btn); }
+
+// Botón "Enviar a Sheets" para un fondo BIOFIN. Usa el slug (prefijado
+// 'biofin-') como ID de deduplicación, igual que MP usa CodigoExterno.
+function botonSheetBIOFIN(l){
+  const id = 'biofin-' + (l._slug||'');
+  if (enviadosSheet.has(id))
+    return `<button class="btn-sm" disabled style="opacity:.55" title="Ya está en la planilla">✅ En Sheet</button>`;
+  return `<button class="btn-sm" onclick='enviarBIOFINPorCodigo("${l.CodigoExterno}", this)'>➕ Enviar a Sheets</button>`;
+}
+// La tarjeta solo tiene el CodigoExterno (string); recuperamos el objeto
+// completo del fondo para armar la fila.
+function enviarBIOFINPorCodigo(codigo, btn){
+  const l = licitacionesBIOFIN.find(x => x.CodigoExterno === codigo);
+  if (!l) { showAlert('No se encontró el fondo.','error'); return; }
+  enviarBIOFIN(l, btn);
+}
 
 // ── Indicador de versión (esquina inferior derecha) ──────────
 (function(){
