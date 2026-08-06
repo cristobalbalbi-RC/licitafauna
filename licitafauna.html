@@ -1891,8 +1891,10 @@ function renderCards() {
     if (filtroActivo !== 'todas' && l._rel !== filtroActivo) return false;
 
     // ── Filtro UNSPSC perfil Robles (toggle) ─────────────────────
-    // Si está activo: ocultar hasta que cargue el detalle y pase el filtro de producto
-    if (filtroUnspsc && (!l._detalleOk || !tieneUnspscPerfil(l))) return false;
+    // Si está activo: ocultar hasta que cargue el detalle y pase el filtro de
+    // producto. EXCEPCIÓN: si ya fue clasificada como Robles (_esRobles, del
+    // caché o en vivo), se muestra aunque el caché no haya guardado los Items.
+    if (filtroUnspsc && !l._esRobles && (!l._detalleOk || !tieneUnspscPerfil(l))) return false;
 
     // ── Filtro por categoría UNSPSC seleccionada ──────────────────
     if (filtroCategoria !== null) {
@@ -2234,7 +2236,7 @@ function licitacionesVisibles() {
   return licitaciones.filter(l => {
     if (l._desc) return false;
     if (filtroActivo !== 'todas' && l._rel !== filtroActivo) return false;
-    if (filtroUnspsc && (!l._detalleOk || !tieneUnspscPerfil(l))) return false;
+    if (filtroUnspsc && !l._esRobles && (!l._detalleOk || !tieneUnspscPerfil(l))) return false;
     if (filtroCategoria !== null) {
       const c = categoriaIndex.get(filtroCategoria);
       if (!c || !c.has(l.CodigoExterno)) return false;
@@ -2428,6 +2430,10 @@ async function cargarDetalles() {
       // MP deja FechaCierre nula en el detalle; la real está en Fechas.FechaCierre
       if (!l.FechaCierre && l.Fechas?.FechaCierre) { l.FechaCierre = l.Fechas.FechaCierre; l._dias = diasRestantes(l.FechaCierre); }
       l._detalleOk = true;
+      // Ya fue clasificada como Robles en su momento. El caché a veces no
+      // guarda los Items (CodigoProducto), así que marcamos la clasificación
+      // para que el filtro "Solo Robles" la muestre sin re-verificar UNSPSC.
+      l._esRobles = true;
       const scoreNuevo = calcularScore(l);
       l._score = scoreNuevo;
       l._rel   = relevanciaCls(scoreNuevo);
@@ -2466,6 +2472,7 @@ async function cargarDetalles() {
 
           // ── Guardar en caché según resultado UNSPSC ───────────
           const esRobles = tieneUnspscPerfil(l);
+          l._esRobles = esRobles;   // marca persistente para el filtro
           if (esRobles) {
             cacheSiRobles[cod] = { det, ts: Date.now() };
           } else {
