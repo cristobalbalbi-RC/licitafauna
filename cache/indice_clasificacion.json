@@ -1,5 +1,5 @@
 {
-  "actualizado": 1786379666224,
+  "actualizado": 1786388722490,
   "lics": {
     "1301-1-LE26": {
       "robles": true,
@@ -47135,6 +47135,11 @@
       "robles": false,
       "estado": "Publicada",
       "ts": 1786379663987
+    },
+    "2684-40-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786388718789
     }
   }
 }
