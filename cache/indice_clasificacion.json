@@ -1,5 +1,5 @@
 {
-  "actualizado": 1786482108481,
+  "actualizado": 1786482122417,
   "lics": {
     "1301-1-LE26": {
       "robles": true,
@@ -50060,6 +50060,51 @@
       "robles": false,
       "estado": "Publicada",
       "ts": 1786482106778
+    },
+    "938-24-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786482109701
+    },
+    "938-25-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786482110552
+    },
+    "948354-123-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786482111499
+    },
+    "948354-124-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786482113151
+    },
+    "948355-63-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786482114624
+    },
+    "948356-136-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786482116560
+    },
+    "948356-137-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786482117620
+    },
+    "948356-138-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786482118515
+    },
+    "994-31-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786482120397
     }
   }
 }
