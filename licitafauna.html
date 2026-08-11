@@ -367,6 +367,12 @@
     .vered summary { cursor: pointer; color: #6E6E33; font-weight: 600; }
     .vered-foot { display: flex; justify-content: space-between; align-items: center;
       margin-top: 6px; font-size: .72rem; color: #8a8f82; }
+    .vered-wa pre {
+      white-space: pre-wrap; word-break: break-word; margin: 6px 0 0;
+      background: #f7f6f2; border: 1px solid var(--borde); border-radius: 4px;
+      padding: 8px; font-size: .74rem; line-height: 1.35; color: #3a3f34;
+      font-family: inherit; max-height: 260px; overflow: auto;
+    }
   </style>
 </head>
 <body>
@@ -2207,6 +2213,31 @@ async function verVeredicto(codigo, btn) {
   }
 }
 
+// ── Mensaje de WhatsApp del veredicto (lo redacta Claude en veredicto.json) ──
+const WHATSAPP_MSGS = {};        // codigo -> texto plano listo para pegar
+
+function escHtmlWa(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
+function textoWhatsapp(v) {
+  const w = v && v.whatsapp;
+  if (!w) return '';
+  return (Array.isArray(w) ? w.join('\n') : String(w)).trim();
+}
+
+function copiarWhatsapp(codigo) {
+  const txt = WHATSAPP_MSGS[codigo] || '';
+  if (!txt) { showAlert('Este veredicto no trae mensaje de WhatsApp.', 'warn'); return; }
+  const ok = () => showAlert('✅ Mensaje copiado — pégalo en el grupo de Robles.', 'info');
+  navigator.clipboard.writeText(txt).then(ok).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta); ok();
+  });
+}
+
 function renderVeredicto(v) {
   const cls = ({ 'GO': 'go', 'NO-GO': 'nogo', 'NO GO': 'nogo', 'REVISAR': 'revisar' })
               [(v.decision || '').toUpperCase()] || 'revisar';
@@ -2214,6 +2245,14 @@ function renderVeredicto(v) {
   const brec = (v.brechas || []).map(x => `<li>${x}</li>`).join('');
   const docx = v.docx
     ? `<a class="btn-sm" target="_blank" href="${EVAL_BASE}/_cache_eval/${encodeURIComponent(v.codigo)}/${encodeURIComponent(v.docx)}">📄 Ficha .docx</a>`
+    : '';
+  const wtxt = textoWhatsapp(v);
+  if (wtxt) WHATSAPP_MSGS[v.codigo] = wtxt;
+  const waBtn = wtxt
+    ? `<button class="btn-sm" onclick="copiarWhatsapp('${v.codigo}')">📱 Copiar WhatsApp</button>`
+    : '';
+  const waPrev = wtxt
+    ? `<details class="vered-wa"><summary>Ver mensaje de WhatsApp</summary><pre>${escHtmlWa(wtxt)}</pre></details>`
     : '';
   return `
     <div class="vered ${cls}">
@@ -2225,7 +2264,8 @@ function renderVeredicto(v) {
       ${v.resumen ? `<p class="vered-res">${v.resumen}</p>` : ''}
       ${reqs ? `<details><summary>Requisitos clave</summary><ul>${reqs}</ul></details>` : ''}
       ${brec ? `<details><summary>Brechas vs. perfil Robles</summary><ul>${brec}</ul></details>` : ''}
-      <div class="vered-foot">${docx} <span>${v.fecha || ''}</span></div>
+      ${waPrev}
+      <div class="vered-foot"><span>${docx} ${waBtn}</span><span>${v.fecha || ''}</span></div>
     </div>`;
 }
 
