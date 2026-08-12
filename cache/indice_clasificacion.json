@@ -1,5 +1,5 @@
 {
-  "actualizado": 1786550625524,
+  "actualizado": 1786550632532,
   "lics": {
     "1301-1-LE26": {
       "robles": true,
@@ -51105,6 +51105,26 @@
       "robles": false,
       "estado": "Publicada",
       "ts": 1786550623655
+    },
+    "956-51-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786550625234
+    },
+    "956-53-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786550626408
+    },
+    "986278-14-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786550627631
+    },
+    "998782-5-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1786550630074
     }
   }
 }
