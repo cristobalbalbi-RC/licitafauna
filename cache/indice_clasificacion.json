@@ -1,5 +1,5 @@
 {
-  "actualizado": 1787328824208,
+  "actualizado": 1787328984974,
   "lics": {
     "1301-1-LE26": {
       "robles": true,
@@ -14789,7 +14789,7 @@
     "704093-72-O126": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785345254218
+      "ts": 1787328864406
     },
     "704093-73-O126": {
       "robles": false,
@@ -14804,7 +14804,7 @@
     "704093-76-O126": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785345258310
+      "ts": 1787328865355
     },
     "704093-77-LP26": {
       "robles": false,
@@ -14819,7 +14819,7 @@
     "704093-82-LR26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785345263124
+      "ts": 1787328870800
     },
     "704093-85-O126": {
       "robles": false,
@@ -20189,12 +20189,12 @@
     "704093-51-O126": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785345247696
+      "ts": 1787328859357
     },
     "704093-52-O126": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785345249819
+      "ts": 1787328860398
     },
     "704093-63-O126": {
       "robles": false,
@@ -20214,12 +20214,12 @@
     "704093-83-LR26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785345264895
+      "ts": 1787328873063
     },
     "704093-84-O126": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785345266934
+      "ts": 1787328874358
     },
     "707412-17-LE26": {
       "robles": false,
@@ -29099,7 +29099,7 @@
     "704093-86-O126": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785345271054
+      "ts": 1787328875665
     },
     "707415-22-LE26": {
       "robles": false,
@@ -29204,7 +29204,7 @@
     "727202-61-LP26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785345348570
+      "ts": 1787328963534
     },
     "729-149-LE26": {
       "robles": false,
@@ -35484,12 +35484,12 @@
     "704093-80-O126": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785767379305
+      "ts": 1787328867655
     },
     "704093-87-O126": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785767380431
+      "ts": 1787328877385
     },
     "704093-88-O126": {
       "robles": false,
@@ -35519,7 +35519,7 @@
     "711841-13-LP26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785767390329
+      "ts": 1787328935070
     },
     "712307-50-LE26": {
       "robles": false,
@@ -35539,7 +35539,7 @@
     "727202-68-LR26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785767398432
+      "ts": 1787328969553
     },
     "727865-4-LE26": {
       "robles": false,
@@ -35554,12 +35554,12 @@
     "729-158-LR26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785767403243
+      "ts": 1787328972401
     },
     "729-160-LP26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1785767404572
+      "ts": 1787328973561
     },
     "729-161-LE26": {
       "robles": false,
@@ -41444,7 +41444,7 @@
     "697057-29-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786025913479
+      "ts": 1787328832600
     },
     "697202-11-LE26": {
       "robles": false,
@@ -41454,7 +41454,7 @@
     "699866-110-LP26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786025916168
+      "ts": 1787328842721
     },
     "701-18-LE26": {
       "robles": false,
@@ -41469,12 +41469,12 @@
     "704093-101-O126": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786025918929
+      "ts": 1787328854358
     },
     "704093-96-LP26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786025920332
+      "ts": 1787328878648
     },
     "707409-22-LE26": {
       "robles": false,
@@ -41489,7 +41489,7 @@
     "707415-24-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786025923838
+      "ts": 1787328891121
     },
     "707416-22-LE26": {
       "robles": false,
@@ -41534,7 +41534,7 @@
     "721703-26-LP26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786025933220
+      "ts": 1787328953968
     },
     "722-4-LE26": {
       "robles": false,
@@ -46679,7 +46679,7 @@
     "699866-109-LP26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786379547265
+      "ts": 1787328840747
     },
     "700-3-L126": {
       "robles": false,
@@ -46694,7 +46694,7 @@
     "705290-60-LP26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786379550288
+      "ts": 1787328880776
     },
     "707409-23-E226": {
       "robles": false,
@@ -46704,17 +46704,17 @@
     "707415-25-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786379552386
+      "ts": 1787328892623
     },
     "707418-33-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786379553436
+      "ts": 1787328899675
     },
     "711-4-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786379555774
+      "ts": 1787328926816
     },
     "721-26-LE26": {
       "robles": false,
@@ -46724,7 +46724,7 @@
     "721703-32-LP26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786379558755
+      "ts": 1787328955061
     },
     "727202-65-LE26": {
       "robles": false,
@@ -46754,7 +46754,7 @@
     "730377-1-L126": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786379565352
+      "ts": 1787328979516
     },
     "730736-29-LE26": {
       "robles": false,
@@ -48439,7 +48439,7 @@
     "696954-2-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786453712775
+      "ts": 1787328830394
     },
     "704093-60-O126": {
       "robles": false,
@@ -48449,17 +48449,17 @@
     "707418-34-L126": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786453715004
+      "ts": 1787328901661
     },
     "707426-28-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786453716780
+      "ts": 1787328920694
     },
     "711-5-LR26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786453717692
+      "ts": 1787328929515
     },
     "799512-46-LE26": {
       "robles": false,
@@ -49934,32 +49934,32 @@
     "705290-61-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786482074731
+      "ts": 1787328882708
     },
     "707423-58-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786482075604
+      "ts": 1787328917198
     },
     "707424-24-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786482076567
+      "ts": 1787328918654
     },
     "721-27-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786482078665
+      "ts": 1787328945760
     },
     "723-4-LP26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786482079595
+      "ts": 1787328960061
     },
     "730566-19-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786482081816
+      "ts": 1787328980522
     },
     "732434-19-LE26": {
       "robles": false,
@@ -50999,22 +50999,22 @@
     "699866-113-LP26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786550595956
+      "ts": 1787328844866
     },
     "711-6-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786550596902
+      "ts": 1787328930920
     },
     "712307-52-O126": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786550597814
+      "ts": 1787328937948
     },
     "727-1-LE26": {
       "robles": false,
       "estado": "Publicada",
-      "ts": 1786550600078
+      "ts": 1787328961662
     },
     "754-9-LE26": {
       "robles": false,
@@ -63140,6 +63140,296 @@
       "robles": false,
       "estado": "Cerrada",
       "ts": 1787328822445
+    },
+    "693-29-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328823607
+    },
+    "693-30-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328825580
+    },
+    "696704-2-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328827328
+    },
+    "696750-5-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328828658
+    },
+    "697057-28-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328831340
+    },
+    "697057-30-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328834349
+    },
+    "697-26-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328835362
+    },
+    "697-27-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328836891
+    },
+    "699866-105-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328839360
+    },
+    "699866-114-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328846679
+    },
+    "699866-115-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328848609
+    },
+    "699866-117-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328850403
+    },
+    "702988-24-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328852549
+    },
+    "704093-107-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328855632
+    },
+    "704093-111-CO26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328857604
+    },
+    "705290-62-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328885282
+    },
+    "705290-63-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328886570
+    },
+    "707409-24-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328889019
+    },
+    "707415-26-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328894375
+    },
+    "707415-27-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328895716
+    },
+    "707416-23-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328897350
+    },
+    "707418-32-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328898338
+    },
+    "707418-36-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328903777
+    },
+    "707418-37-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328905330
+    },
+    "707418-38-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328906886
+    },
+    "707418-39-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328908357
+    },
+    "707419-34-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328909887
+    },
+    "707419-35-CO26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328911701
+    },
+    "707419-36-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328913351
+    },
+    "707420-18-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328914423
+    },
+    "707420-19-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328915446
+    },
+    "707420-20-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328916328
+    },
+    "707428-25-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328923223
+    },
+    "709603-9-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328924374
+    },
+    "710326-2-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328925460
+    },
+    "711-7-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328932029
+    },
+    "711-8-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328935927
+    },
+    "711-9-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328937044
+    },
+    "712307-53-O126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328938860
+    },
+    "712307-55-O126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328940109
+    },
+    "712307-57-O126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328940989
+    },
+    "712307-58-O126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328941916
+    },
+    "720-9-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328942773
+    },
+    "721-28-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328947029
+    },
+    "721-29-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328948203
+    },
+    "721-30-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328950434
+    },
+    "721-31-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328951526
+    },
+    "721703-34-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328956289
+    },
+    "722-5-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328958654
+    },
+    "727202-64-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328965832
+    },
+    "727202-67-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328966691
+    },
+    "727202-69-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328970416
+    },
+    "727202-71-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328971498
+    },
+    "729-166-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328974714
+    },
+    "729-169-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328977142
+    },
+    "729-170-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328978389
+    },
+    "730736-34-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328981662
+    },
+    "731159-2-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1787328983117
     }
   }
 }
