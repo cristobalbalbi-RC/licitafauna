@@ -1450,8 +1450,12 @@ const LS_PROD_PERFIL = 'lf_prod_perfil_v1';
 // ── Caché de resultados por búsqueda ─────────────────────────────
 // lf_no_robles: Set<CodigoExterno> que ya sabemos que no son Robles
 // lf_si_robles: {CodigoExterno: {det, ts}} con detalle completo guardado
-const LS_NO_ROBLES = 'lf_no_robles_v1';
-const LS_SI_ROBLES = 'lf_si_robles_v1';
+// La llave sube de _v1 a _v2 junto con el filtro. Así el caché local de
+// descartadas que escribió la versión anterior se ignora solo, sin que
+// nadie tenga que limpiar nada a mano: entradas guardadas con el filtro
+// viejo dejarían fuera licitaciones que el filtro nuevo sí aprueba.
+const LS_NO_ROBLES = 'lf_no_robles_v2';
+const LS_SI_ROBLES = 'lf_si_robles_v2';
 const CACHE_TTL_DESC = 14 * 86400000; // 14 días para descartadas
 const CACHE_TTL_APRO =  7 * 86400000; //  7 días para aprobadas
 let cacheNoRobles = {};  // {CodigoExterno: timestamp}
@@ -1476,10 +1480,16 @@ async function bajarIndiceCompartido() {
     let n = 0;
     for (const cod in lics) {
       const e = lics[cod];
-      // v2: una clasificación NEGATIVA hecha con el filtro viejo no vale.
-      // Se ignora para que la licitación se vuelva a evaluar con las
-      // reglas nuevas (obras condicionadas + red de seguridad por texto).
-      if (e.robles === false && (e.ts || 0) < FILTRO_VERSION_TS) { continue; }
+      // Una clasificación NEGATIVA hecha con un filtro más viejo no vale:
+      // se ignora para que la licitación se re-evalúe con las reglas nuevas.
+      //
+      // Se compara por VERSIÓN DE FILTRO, no por fecha. Antes usaba la fecha
+      // y no servía: mientras parte del equipo siga con la app vieja, sus
+      // apps clasifican con el filtro antiguo y suben ese "no" con fecha de
+      // hoy, así que pasaba el control. Por eso 1261-28-LR26 (el sendero de
+      // Renca) llegaba descartada aunque el filtro nuevo la aprueba.
+      const fvEntrada = e.fv || 1;          // sin marca = filtro v1
+      if (e.robles === false && fvEntrada < FILTRO_VERSION) { continue; }
       if (e.robles === false && !(cod in cacheNoRobles)) { cacheNoRobles[cod] = e.ts || Date.now(); n++; }
       else if (e.robles === true && !(cod in cacheSiRobles)) { cacheSiRobles[cod] = { det: e.det || {}, ts: e.ts || Date.now() }; n++; }
     }
@@ -1521,7 +1531,11 @@ async function subirIndiceCompartido() {
 // interrumpe la exploración (cierre de app, caída del server, etc.).
 const LOTE_SUBIDA = 100;
 function registrarClasificacion(cod, esRobles, estado) {
-  nuevasClasificaciones[cod] = { robles: !!esRobles, estado: estado || '', ts: Date.now() };
+  // fv = versión del filtro que emitió este veredicto. Permite que quien
+  // tenga un filtro más nuevo ignore los "no" de versiones anteriores sin
+  // depender de la fecha (ver bajarIndiceCompartido).
+  nuevasClasificaciones[cod] = { robles: !!esRobles, estado: estado || '',
+                                 ts: Date.now(), fv: FILTRO_VERSION };
   if (Object.keys(nuevasClasificaciones).length >= LOTE_SUBIDA) {
     subirIndiceCompartido();   // parcial, en segundo plano
   }
@@ -2065,8 +2079,9 @@ function cargarCacheResultados() {
       const obj = JSON.parse(rawN);
       // Purgar entradas expiradas
       for (const k of Object.keys(obj)) {
-        // v2: además del TTL, se descarta todo veredicto negativo anterior
-        // a la ampliación del perfil.
+        // Además del TTL, se descarta todo veredicto negativo anterior a la
+        // ampliación del perfil. El caché local lo escribe siempre esta misma
+        // app, así que acá la fecha sí sirve como marca de versión.
         if (ahora - obj[k] < CACHE_TTL_DESC && obj[k] >= FILTRO_VERSION_TS) cacheNoRobles[k] = obj[k];
       }
     }
@@ -3202,8 +3217,12 @@ async function cargarDetalles() {
     const cod = l.CodigoExterno;
 
     // ── Revisar caché de descartadas ──────────────────────────────
+    // OJO: acá NO se marca _detalleOk. Saber que algo se descartó no es lo
+    // mismo que tener su ficha. Marcarlo como cargado dejaba la tarjeta
+    // vacía si después aparecía en una búsqueda por palabra clave (que
+    // ignora _desc a propósito) y además impedía que se completara.
     if (cacheNoRobles[cod]) {
-      l._detalleOk = true;
+      l._veredictoNo = true;
       l._desc = true;
       cacheHits++;
       cargados++;
