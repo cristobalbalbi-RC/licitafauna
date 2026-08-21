@@ -664,6 +664,28 @@
     <div class="filtro-row" id="kwResumen" style="margin-top:6px;display:none">
       <span class="toolbar-label" id="kwResumenTxt"></span>
     </div>
+
+    <!-- Fila 3: Almacén de fichas en disco -->
+    <div class="filtro-row" id="cacheRow" style="margin-top:8px">
+      <span class="toolbar-label">🗄️ Caché de fichas:</span>
+      <span class="toolbar-label" id="cacheEstado">consultando…</span>
+      <button class="ftag" id="btnCacheBuild" onclick="construirCache()"
+              title="Descarga y guarda en disco la ficha completa de TODAS las licitaciones activas. Se hace una vez; después las búsquedas por palabra son instantáneas. Es reanudable: si lo detienes, retoma donde quedó.">
+        🏗️ Construir caché completo
+      </button>
+      <button class="ftag" id="btnCacheStop" onclick="detenerCache()" style="display:none">⏹️ Detener</button>
+      <button class="ftag" id="btnCacheBajar" onclick="bajarCacheEquipo()"
+              title="Trae el almacén que ya construyó otra persona del equipo. Fusiona: no borra las fichas que solo tienes tú.">
+        📥 Bajar del equipo
+      </button>
+      <button class="ftag" id="btnCachePublicar" onclick="publicarCacheEquipo()"
+              title="Sube tu almacén para que el resto del equipo no tenga que reconstruirlo. Antes fusiona lo que haya en el repo, así no pisas el trabajo de otro.">
+        📤 Publicar al equipo
+      </button>
+      <div id="cacheBarra" style="display:none;flex:1;min-width:160px;height:8px;background:#E8E4DC;border-radius:4px;overflow:hidden">
+        <div id="cacheBarraFill" style="width:0%;height:100%;background:var(--verde);transition:width .3s"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Evaluación IA por lote -->
@@ -1683,12 +1705,12 @@ function agregarKw() {
   }
   inp.value = '';
   inp.focus();
-  if (agregadas) { guardarKw(); renderKwChips(); renderCards(); }
+  if (agregadas) { guardarKw(); renderKwChips(); renderCards(); cargarDetallesKw(); }
 }
 
 function quitarKw(i) {
   kwBusqueda.splice(i, 1);
-  guardarKw(); renderKwChips(); renderCards();
+  guardarKw(); renderKwChips(); renderCards(); cargarDetallesKw();
 }
 
 function limpiarKw() {
@@ -1703,7 +1725,7 @@ function toggleKwModo() {
     b.textContent = kwModoTodas ? 'Coincide: todas' : 'Coincide: cualquiera';
     kwModoTodas ? b.classList.add('active') : b.classList.remove('active');
   }
-  guardarKw(); renderCards();
+  guardarKw(); renderCards(); cargarDetallesKw();
 }
 
 function renderKwChips() {
@@ -1738,6 +1760,169 @@ function coincideKw(l) {
   return kwModoTodas
     ? kwBusqueda.every(k => t.includes(k))
     : kwBusqueda.some(k => t.includes(k));
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  ALMACÉN DE FICHAS EN DISCO (v2, 21-08-2026)
+// ══════════════════════════════════════════════════════════════════
+// El servidor local guarda en cache/fichas.jsonl la ficha COMPLETA de cada
+// licitación. Antes solo se guardaba el detalle de las que pasaban el
+// perfil; el resto se volvía a bajar de MP cada vez que aparecía en una
+// búsqueda por palabra. Ahora se guarda todo: 12.852 fichas ≈ 36 MB, que en
+// disco no es nada (localStorage no servía: tope de ~5 MB).
+let cachePoll = null;
+
+function fmtDur(s) {
+  if (!s || s < 0) return '—';
+  const m = Math.floor(s / 60), h = Math.floor(m / 60);
+  if (h) return `${h} h ${m % 60} min`;
+  if (m) return `${m} min`;
+  return `${s} s`;
+}
+
+async function refrescarEstadoCache(silencioso = true) {
+  const el = document.getElementById('cacheEstado');
+  if (!el) return null;
+  if (!EN_LOCAL) {
+    el.textContent = 'no disponible (requiere el servidor local)';
+    const b = document.getElementById('btnCacheBuild');
+    if (b) b.style.display = 'none';
+    return null;
+  }
+  try {
+    const r = await fetch(`${EVAL_BASE}/api-cache-estado`, { signal: AbortSignal.timeout(8000) });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const j = await r.json();
+    pintarEstadoCache(j);
+    return j;
+  } catch (e) {
+    if (!silencioso) showAlert(`⚠️ No se pudo leer el estado del caché: ${e.message}`, 'error');
+    el.textContent = 'no disponible';
+    return null;
+  }
+}
+
+function pintarEstadoCache(j) {
+  const el    = document.getElementById('cacheEstado');
+  const bBuild= document.getElementById('btnCacheBuild');
+  const bStop = document.getElementById('btnCacheStop');
+  const barra = document.getElementById('cacheBarra');
+  const fill  = document.getElementById('cacheBarraFill');
+  if (!el) return;
+  const b = j.build || {};
+
+  if (b.corriendo) {
+    const pct = b.total ? Math.round(b.procesadas / b.total * 100) : 0;
+    el.innerHTML = `<strong>${b.procesadas}/${b.total}</strong> (${pct}%) · ` +
+      `${b.hechas} nuevas · ${b.saltadas} ya estaban` +
+      (b.errores ? ` · ${b.errores} fallidas` : '') +
+      (b.eta_s ? ` · faltan ~${fmtDur(b.eta_s)}` : '');
+    if (bBuild) bBuild.style.display = 'none';
+    if (bStop)  bStop.style.display  = '';
+    if (barra)  barra.style.display  = '';
+    if (fill)   fill.style.width     = pct + '%';
+  } else {
+    el.innerHTML = `<strong>${j.total || 0}</strong> fichas guardadas · ${j.mb || 0} MB` +
+      (b.mensaje && b.mensaje !== 'sin correr' ? ` · último barrido: ${b.mensaje}` : '');
+    if (bBuild) bBuild.style.display = '';
+    if (bStop)  bStop.style.display  = 'none';
+    if (barra)  barra.style.display  = 'none';
+    if (cachePoll) { clearInterval(cachePoll); cachePoll = null; }
+  }
+}
+
+async function construirCache() {
+  if (!EN_LOCAL) {
+    showAlert('El caché en disco necesita el servidor local (abre la app, no el HTML suelto).', 'error');
+    return;
+  }
+  try {
+    const r = await fetch(`${EVAL_BASE}/api-cache-build`, { signal: AbortSignal.timeout(10000) });
+    const j = await r.json();
+    showAlert(j.ok
+      ? '🏗️ Barrido iniciado. Puedes seguir usando la app: corre en segundo plano y es reanudable.'
+      : `ℹ️ ${j.mensaje}`, 'info');
+    if (cachePoll) clearInterval(cachePoll);
+    cachePoll = setInterval(refrescarEstadoCache, 2000);
+    refrescarEstadoCache();
+  } catch (e) {
+    showAlert(`⚠️ No se pudo iniciar el barrido: ${e.message}`, 'error');
+  }
+}
+
+async function detenerCache() {
+  try {
+    await fetch(`${EVAL_BASE}/api-cache-build?accion=detener`, { signal: AbortSignal.timeout(8000) });
+    showAlert('⏹️ Deteniendo… lo ya descargado queda guardado; la próxima vez retoma ahí.', 'info');
+    refrescarEstadoCache();
+  } catch (e) { /* silencioso */ }
+}
+
+// ── Almacén compartido con el equipo ──────────────────────────────
+// Uno construye (2 h) y publica; el resto lo baja armado. Viaja
+// comprimido: ~36 MB de fichas quedan en ~1-3 MB.
+async function bajarCacheEquipo() {
+  if (!EN_LOCAL) { showAlert('Necesita el servidor local.', 'error'); return; }
+  const b = document.getElementById('btnCacheBajar');
+  if (b) { b.disabled = true; b.textContent = '📥 Bajando…'; }
+  try {
+    const r = await fetch(`${EVAL_BASE}/api-cache-bajar`, { signal: AbortSignal.timeout(180000) });
+    const j = await r.json();
+    showAlert(`${j.ok ? '✅' : '⚠️'} ${j.mensaje}`, j.ok ? 'info' : 'error');
+    refrescarEstadoCache();
+  } catch (e) {
+    showAlert(`⚠️ No se pudo bajar: ${e.message}`, 'error');
+  } finally {
+    if (b) { b.disabled = false; b.textContent = '📥 Bajar del equipo'; }
+  }
+}
+
+// Devolver al equipo lo que aprendimos en esta pasada. El servidor decide
+// si vale la pena: solo sube si tiene bastante más que el repo y si no
+// acaba de subir. No bloquea nada ni muestra alertas si no aplica.
+async function publicarCacheSiConviene() {
+  if (!EN_LOCAL) return;
+  try {
+    const r = await fetch(`${EVAL_BASE}/api-cache-publicar?auto=1`, { signal: AbortSignal.timeout(15000) });
+    const j = await r.json();
+    if (j.publicado) {
+      showAlert(`📤 Compartiendo con el equipo: ${j.motivo}.`, 'info');
+      setTimeout(refrescarEstadoCache, 4000);
+    }
+  } catch (e) { /* silencioso: es un extra, no debe estorbar */ }
+}
+
+async function publicarCacheEquipo() {
+  if (!EN_LOCAL) { showAlert('Necesita el servidor local.', 'error'); return; }
+  const b = document.getElementById('btnCachePublicar');
+  if (b) { b.disabled = true; b.textContent = '📤 Publicando…'; }
+  try {
+    const r = await fetch(`${EVAL_BASE}/api-cache-publicar`, { signal: AbortSignal.timeout(240000) });
+    const j = await r.json();
+    showAlert(j.ok
+      ? `✅ ${j.mensaje} (${j.mb_gz} MB comprimidos). El equipo ya puede bajarlo.`
+      : `⚠️ ${j.mensaje}`, j.ok ? 'info' : 'error');
+    refrescarEstadoCache();
+  } catch (e) {
+    showAlert(`⚠️ No se pudo publicar: ${e.message}`, 'error');
+  } finally {
+    if (b) { b.disabled = false; b.textContent = '📤 Publicar al equipo'; }
+  }
+}
+
+// Pide al servidor las fichas de varios códigos de una sola vez.
+// Devuelve {encontradas: [det...], faltan: [cod...]}.
+async function fichasDelDisco(codigos) {
+  if (!EN_LOCAL || !codigos.length) return { encontradas: [], faltan: codigos };
+  try {
+    const r = await fetch(`${EVAL_BASE}/api-fichas-lote?codigos=${encodeURIComponent(codigos.join(','))}`,
+                          { signal: AbortSignal.timeout(20000) });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const j = await r.json();
+    return { encontradas: j.Listado || [], faltan: j.faltan || [] };
+  } catch (e) {
+    return { encontradas: [], faltan: codigos };
+  }
 }
 
 // Compatibilidad: el resto del código llama a tieneUnspscPerfil().
@@ -2248,7 +2433,13 @@ function relevanciaCls(score) {
 // ================================================================
 function linkMP(codigo) {
   if (!codigo) return '#';
-  return `https://www.mercadopublico.cl/Procurement/Modules/RFB/SearchBrowse.aspx?Ntt=${encodeURIComponent(codigo)}`;
+  // OJO: NO usar SearchBrowse.aspx?Ntt=<id>. Ese era el buscador antiguo de
+  // WebForms; hoy Mercado Público lo redirige a /Home, así que el link
+  // siempre terminaba en la portada en vez de la ficha (verificado 21-08-2026).
+  //
+  // DetailsAcquisition.aspx acepta el ID público como ?idlicitacion= y el
+  // propio servidor lo traduce al ?qs=<hash cifrado> de la ficha real.
+  return `https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion=${encodeURIComponent(codigo)}`;
 }
 
 // ================================================================
@@ -2867,6 +3058,125 @@ function limpiarFechas() {
 }
 
 // ================================================================
+//  DETALLE DE UNA LICITACIÓN (helper compartido)
+// ================================================================
+// El listado de MP (?estado=activas) solo trae Nombre y fechas. Monto,
+// descripción, comprador e ítems UNSPSC llegan recién con ?codigo=<id>.
+// Por eso una licitación sin detalle se ve "pelada", solo con su nombre.
+const detallesEnCurso = new Set();   // evita pedir dos veces el mismo código
+
+async function fetchDetalleLic(l) {
+  const cod = l.CodigoExterno;
+  if (!cod || l._detalleOk || detallesEnCurso.has(cod)) return false;
+  detallesEnCurso.add(cod);
+  try {
+    const ep = EN_LOCAL
+      ? `${LOCAL_PROXY}?codigo=${encodeURIComponent(cod)}`
+      : `${API_BASE}?ticket=${PERFIL.ticket}&codigo=${encodeURIComponent(cod)}`;
+    const r = await fetch(ep, { signal: AbortSignal.timeout(10000) });
+    if (!r.ok) return false;
+    const det = (await r.json()).Listado?.[0];
+    if (!det) return false;
+
+    Object.assign(l, det);
+    // MP deja FechaCierre nula en el detalle; la real está en Fechas.FechaCierre
+    if (!l.FechaCierre && l.Fechas?.FechaCierre) {
+      l.FechaCierre = l.Fechas.FechaCierre;
+      l._dias = diasRestantes(l.FechaCierre);
+    }
+    l._detalleOk = true;
+
+    const clas = clasificarPerfil(l);
+    l._perfil = clas.v;
+    l._perfilMotivo = clas.motivo;
+    l._perfilCalcOk = true;
+
+    l._score = calcularScore(l);
+    l._rel   = relevanciaCls(l._score);
+    indexarCategorias(l);
+
+    if (clas.v === 'si')      cacheSiRobles[cod] = { det, ts: Date.now() };
+    else if (clas.v === 'no') { cacheNoRobles[cod] = Date.now(); if (filtroUnspsc) l._desc = true; }
+    if (clas.v !== 'revisar') registrarClasificacion(cod, clas.v === 'si', l.Estado || l.CodigoEstado || '');
+    return true;
+  } catch (e) {
+    return false;   // 429 / timeout: se reintenta en la próxima pasada
+  } finally {
+    detallesEnCurso.delete(cod);
+  }
+}
+
+// ── Completar los resultados de una búsqueda por palabras clave ──
+// Las coincidencias suelen ser pocas, así que se pueden completar en
+// segundos en vez de esperar el recorrido de las ~9.700 activas.
+const KW_TOPE_DETALLES = 80;   // tope por tanda, para no colgarse
+let kwCargandoDetalles = false;
+
+async function cargarDetallesKw() {
+  if (kwCargandoDetalles || !kwBusqueda.length) return;
+  let pend = licitaciones.filter(l => !l._detalleOk && coincideKw(l));
+  if (!pend.length) return;
+
+  kwCargandoDetalles = true;
+  const txt = () => document.getElementById('kwResumenTxt');
+
+  // ── Paso 1: el almacén de disco, de una sola vez ────────────────
+  // Si el caché completo está construido, esto resuelve TODO al instante
+  // y no se toca MP. Una sola petición para cientos de fichas.
+  if (EN_LOCAL) {
+    const t = txt();
+    if (t) t.innerHTML = `⏳ Leyendo ${pend.length} fichas del caché en disco…`;
+    const porCodigo = new Map(pend.map(l => [l.CodigoExterno, l]));
+    const { encontradas } = await fichasDelDisco([...porCodigo.keys()]);
+    for (const det of encontradas) {
+      const l = porCodigo.get(det.CodigoExterno);
+      if (!l) continue;
+      Object.assign(l, det);
+      if (!l.FechaCierre && l.Fechas?.FechaCierre) {
+        l.FechaCierre = l.Fechas.FechaCierre;
+        l._dias = diasRestantes(l.FechaCierre);
+      }
+      l._detalleOk = true;
+      const c = clasificarPerfil(l);
+      l._perfil = c.v; l._perfilMotivo = c.motivo; l._perfilCalcOk = true;
+      l._score = calcularScore(l);
+      l._rel   = relevanciaCls(l._score);
+      indexarCategorias(l);
+    }
+    if (encontradas.length) renderCards();
+    pend = pend.filter(l => !l._detalleOk);
+    if (!pend.length) {          // el caché lo cubrió todo
+      kwCargandoDetalles = false;
+      actualizarStats();
+      renderCards();
+      return;
+    }
+  }
+
+  // ── Paso 2: lo que falte, a MP de a una ─────────────────────────
+  const tope = Math.min(pend.length, KW_TOPE_DETALLES);
+  let hechas = 0;
+
+  for (let i = 0; i < tope; i++) {
+    if (!kwBusqueda.length) break;            // el usuario limpió la búsqueda
+    const l = pend[i];
+    if (!coincideKw(l)) continue;             // cambiaron las palabras
+    const ok = await fetchDetalleLic(l);
+    if (ok) { hechas++; actualizarCard(l); }
+    const t = txt();
+    if (t) t.innerHTML = `⏳ Bajando de MP las que faltan en el caché… ${i + 1}/${tope}` +
+      (pend.length > tope ? ` (hay ${pend.length - tope} más — conviene construir el caché completo)` : '');
+    await new Promise(res => setTimeout(res, 700));   // rate limit de MP (429)
+  }
+
+  kwCargandoDetalles = false;
+  guardarCacheResultados();
+  actualizarStats();
+  renderCards();
+  if (hechas) console.log(`🔎 Búsqueda: completadas ${hechas} fichas`);
+}
+
+// ================================================================
 //  CARGA PROGRESIVA DE DETALLES
 // ================================================================
 async function cargarDetalles() {
@@ -2920,58 +3230,13 @@ async function cargarDetalles() {
     }
 
     // ── Fetch desde API ───────────────────────────────────────────
-    try {
-      const endpoint = EN_LOCAL
-        ? `${LOCAL_PROXY}?codigo=${encodeURIComponent(cod)}`
-        : `${API_BASE}?ticket=${PERFIL.ticket}&codigo=${encodeURIComponent(cod)}`;
-
-      const r = await fetch(endpoint, { signal: AbortSignal.timeout(10000) });
-      if (r.ok) {
-        const json = await r.json();
-        const det = json.Listado?.[0];
-        if (det) {
-          Object.assign(l, det);   // fusionar todos los campos del detalle
-          // MP deja FechaCierre nula en el detalle; la real está en Fechas.FechaCierre
-          if (!l.FechaCierre && l.Fechas?.FechaCierre) { l.FechaCierre = l.Fechas.FechaCierre; l._dias = diasRestantes(l.FechaCierre); }
-          l._detalleOk = true;
-
-          // Re-score con texto completo + UNSPSC
-          const scoreNuevo = calcularScore(l);
-          l._score = scoreNuevo;
-          l._rel   = relevanciaCls(scoreNuevo);
-
-          // Indexar categorías UNSPSC para el panel de chips
-          indexarCategorias(l);
-
-          // ── Guardar en caché según resultado UNSPSC ───────────
-          // v2: 3 estados. Las 'revisar' NO se cachean como descartadas,
-          // porque el veredicto lo tiene que dar una persona.
-          const clas = clasificarPerfil(l);
-          l._perfil = clas.v;
-          l._perfilMotivo = clas.motivo;
-          l._perfilCalcOk = true;
-          if (clas.v === 'si') {
-            cacheSiRobles[cod] = { det, ts: Date.now() };
-          } else if (clas.v === 'no') {
-            cacheNoRobles[cod] = Date.now();
-            if (filtroUnspsc) { l._desc = true; }
-          }
-          // Registrar para la libreta compartida del equipo (se sube en lote).
-          // v2: las 'revisar' NO se registran en el índice compartido. Su
-          // veredicto lo da una persona; si se subieran como true/false
-          // quedarían congeladas para todo el equipo con un juicio que
-          // nadie tomó. Se re-evalúan en cada corrida.
-          if (clas.v !== 'revisar') {
-            registrarClasificacion(cod, clas.v === 'si', l.Estado || l.CodigoEstado || '');
-          }
-
-          if (scoreNuevo === 0 && !filtroUnspsc) { l._desc = true; }
-
-          actualizarCard(l);
-        }
-      }
-    } catch(e) {
-      // silencioso — la card queda con la info del título
+    // Usa el helper compartido: clasifica en 3 estados, guarda en caché,
+    // registra en la libreta del equipo (salvo las 'revisar') y evita que
+    // este bucle y la búsqueda por palabras pidan el mismo código a la vez.
+    const ok = await fetchDetalleLic(l);
+    if (ok) {
+      if (l._score === 0 && !filtroUnspsc) { l._desc = true; }
+      actualizarCard(l);
     }
 
     cargados++;
@@ -2987,6 +3252,7 @@ async function cargarDetalles() {
   guardarCacheProductos();    // guardar catálogo de categorías
   guardarCacheResultados();   // guardar aprobadas/descartadas
   subirIndiceCompartido();    // + subir en lote a la libreta compartida del equipo
+  publicarCacheSiConviene();  // + devolver al equipo las fichas nuevas de esta pasada
   const roblesCount    = licitaciones.filter(l => l._detalleOk && l._perfil === 'si').length;
   const revisarCount   = licitaciones.filter(l => l._detalleOk && l._perfil === 'revisar').length;
   const analizadasCount = licitaciones.filter(l => l._detalleOk).length;
@@ -3289,6 +3555,22 @@ async function iniciarBusqueda() {
     const rangoTxt = desdeVal || hastaVal
       ? ` · filtrando${desdeVal ? ' desde ' + desdeVal : ''}${hastaVal ? ' hasta ' + hastaVal : ''}`
       : '';
+    // ── Sincronizar con el caché del equipo ANTES de buscar ────────
+    // Traer primero lo que otros ya averiguaron: así solo se le piden a MP
+    // las fichas que nadie tiene todavía. No hay nada programado ni corriendo
+    // por su cuenta; esto pasa solo cuando tú aprietas Buscar.
+    if (EN_LOCAL) {
+      estado.textContent = 'Sincronizando con el caché del equipo…';
+      try {
+        const rs = await fetch(`${EVAL_BASE}/api-cache-bajar`, { signal: AbortSignal.timeout(120000) });
+        const js = await rs.json();
+        if (js.bajadas) showAlert(`📥 ${js.bajadas} fichas nuevas del equipo (ahora tienes ${js.total}).`, 'info');
+        refrescarEstadoCache();
+      } catch (e) {
+        console.warn('sincronización omitida:', e.message);   // sin red: seguir igual
+      }
+    }
+
     estado.textContent = `Descargando todas las licitaciones activas${rangoTxt}…`;
 
     // ── Una sola llamada: todas las activas ────────────────────────
@@ -3446,6 +3728,8 @@ function cambiarFuente(f){
   // no haría nada, así que se oculta en vez de quedar muerta en pantalla.
   const kwR = document.getElementById('kwRow');
   if (kwR) kwR.style.display = (f === 'mp') ? 'flex' : 'none';
+  const cR = document.getElementById('cacheRow');
+  if (cR) cR.style.display = (f === 'mp') ? 'flex' : 'none';
   const kwRes = document.getElementById('kwResumen');
   if (kwRes && f !== 'mp') kwRes.style.display = 'none';
   if(f !== 'mp' && perfilPanelVisible) togglePerfilPanel();
@@ -5180,6 +5464,7 @@ async function evaluarBID(codigo, btn, noticeId){
     cargarCacheResultados();    // cacheNoRobles + cacheSiRobles
     cargarKw();                 // palabras clave acumuladas de la sesión anterior
     renderKwChips();
+    refrescarEstadoCache();     // cuántas fichas hay guardadas en disco
     const bKw = document.getElementById('btnKwModo');
     if (bKw && kwModoTodas) { bKw.textContent = 'Coincide: todas'; bKw.classList.add('active'); }
     bajarIndiceCompartido();    // + libreta compartida del equipo (async, no bloquea)
