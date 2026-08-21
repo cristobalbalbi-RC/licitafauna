@@ -724,6 +724,22 @@ const PERFIL_LISTA = [
   { c:'81151604', n:'Agrimensura / topografía predial',                      g:'Técnicos de Apoyo' },
   { c:'60104202', n:'Kits de muestreo y pruebas del agua',                   g:'Técnicos de Apoyo' },
   { c:'93141707', n:'Servicios de preservación del patrimonio cultural/natural', g:'Técnicos de Apoyo' },
+  // ── OBRAS E INFRAESTRUCTURA EN ÁREAS NATURALES ───────────────────
+  // Agregado v2 (21-08-2026). Códigos de obra/infraestructura que son
+  // inequívocamente del giro de Robles: no hay forma de que un
+  // "sendero de caminantes" o un "muro de contención" en este catálogo
+  // sea otra cosa. Las obras GENÉRICAS (obras civiles, pavimentación,
+  // edificios) NO van acá: van en PERFIL.obras_condicionadas, que exige
+  // contexto natural en el texto. Ver clasificarPerfil().
+  { c:'30222054', n:'Sendero de caminantes',                                 g:'Obras en Áreas Naturales' },
+  { c:'72102902', n:'Servicios de paisajismo y arquitectura paisajista',     g:'Obras en Áreas Naturales' },
+  { c:'72102504', n:'Construcción de muros de contención (erosión/laderas)', g:'Obras en Áreas Naturales' },
+  { c:'70171701', n:'Mantenimiento o administración de canales',             g:'Obras en Áreas Naturales' },
+  { c:'70171703', n:'Mantenimiento o administración de embalses',            g:'Obras en Áreas Naturales' },
+  { c:'70171802', n:'Drenaje de aguas fluviales',                            g:'Obras en Áreas Naturales' },
+  { c:'77101601', n:'Planificación de desarrollo medioambiental urbano',     g:'Gestión Ambiental' },
+  { c:'77101805', n:'Servicios de control de calidad medioambiental',        g:'Gestión Ambiental' },
+  { c:'81151602', n:'Producción de mapas / cartografía',                     g:'Técnicos de Apoyo' },
 ];
 
 // ================================================================
@@ -1213,7 +1229,123 @@ const PERFIL = {
     '70151503', // Organizaciones o cooperativas forestales (entidad, no servicio)
     '70161702', // Administración del ecosistema marino (Robles trabaja en terrestre)
   ]),
+
+  // ══════════════════════════════════════════════════════════════
+  //  v2 (21-08-2026) — DESGLOSE DE OBRAS Y BIENES
+  // ══════════════════════════════════════════════════════════════
+  // Códigos de obra, bien o servicio GENÉRICO que por sí solos no dicen
+  // nada: "Construcción de obras civiles" tanto sirve para un consultorio
+  // como para un sendero de montaña. No se aceptan ni se rechazan por el
+  // código: se resuelven por el CONTEXTO del título y la descripción.
+  //   ctx fuerte  → entra al perfil (SÍ)
+  //   ctx débil o comprador ambiental → REVISAR
+  //   sin contexto → descartada
+  obras_condicionadas: new Set([
+    // Obras y construcción
+    '72131702', // Construcción de obras civiles
+    '72131701', // Pavimentación de carreteras o caminos
+    '72131601', // Construcción de edificios
+    '72102801', // Renovación de edificios, casas, señales y monumentos
+    '72102802', // Restauración de edificios, casas, señales o monumentos
+    '72141101', // Construcción de obras de tierra / movimiento de tierras
+    '72151900', // Servicios de instalación de estructuras exteriores
+    // Materiales y estructuras
+    '30161907', // Escaleras
+    '30152001', // Cercos de metal
+    '30152003', // Murallas de fibrocemento
+    '30191502', // Andamios
+    '30201706', // Baños portátiles
+    '30222803', // Canal de riego
+    '41102422', // Baños secos o bloques térmicos
+    '24111810', // Tanques de almacenamiento de agua
+    '21101510', // Cañerías o tuberías de riego
+    // Mobiliario y señalética
+    '56101532', // Mobiliario
+    '56112106', // Banquetas
+    '55121700', // Letreros y señalética
+    '55121719', // Señales de información
+    // Tecnología aplicada a parques
+    '43233004', // Software de sistema operativo
+    '43232300', // Software de gestión / trazabilidad
+    '81112200', // Servicios de desarrollo de software a medida
+    // Estudios y apoyo genérico
+    '80101504', // Planificación estratégica
+    '80101604', // Gerencia de proyectos
+    '93142009', // Administración o gestión de proyectos de desarrollo urbano
+  ]),
+
+  // Contexto FUERTE: si aparece cualquiera de estos en título o descripción,
+  // una obra condicionada pasa directo al perfil. Son términos que solo
+  // aparecen en el mundo de áreas naturales protegidas y uso público.
+  ctx_fuerte: [
+    'sendero', 'senderos', 'senderismo',
+    'mirador', 'miradores',
+    'área protegida', 'áreas protegidas', 'area protegida', 'areas protegidas',
+    'santuario de la naturaleza', 'santuario naturaleza',
+    'parque nacional', 'parque metropolitano', 'reserva nacional',
+    'reserva natural', 'monumento natural',
+    'bosque nativo', 'bosque esclerófilo', 'bosque esclerofilo',
+    'humedal', 'humedales', 'bofedal',
+    'quebrada', 'ladera', 'cerro isla', 'precordillera',
+    'biodiversidad', 'fauna silvestre', 'flora nativa', 'especies nativas',
+    'restauración ecológica', 'restauracion ecologica',
+    'conservación', 'conservacion',
+    'ecosistema', 'ecosistemas',
+    'forestal', 'forestales',
+    'uso público', 'uso publico',
+    'interpretación ambiental', 'interpretacion ambiental',
+    'guardaparque', 'guardaparques',
+    'vivero', 'viverización',
+    'erosión', 'erosion',
+    'cuenca hidrográfica', 'cuenca hidrografica',
+    'cortafuego', 'cortafuegos',
+    'reforestación', 'reforestacion', 'revegetación', 'revegetacion',
+  ],
+
+  // Contexto DÉBIL: sugiere el ámbito pero no lo confirma. Manda a REVISAR.
+  ctx_debil: [
+    'parque', 'parques',
+    'cordillera', 'montaña', 'montana',
+    'natural', 'naturaleza',
+    'ambiental', 'medio ambiente',
+    'visitante', 'visitantes',
+    'ecológico', 'ecologico',
+    'recreativo', 'recreación', 'recreacion',
+    'arborización', 'arborizacion', 'arbolado',
+    'paisaj',
+    'cerro', 'cerros',
+    'ribera', 'riberas',
+  ],
+
+  // Compradores cuyo giro ES el medio ambiente. Si el organismo es uno de
+  // estos, cualquier licitación suya que no matchee el UNSPSC igual se
+  // muestra como REVISAR en vez de desaparecer. Se compara en MAYÚSCULAS
+  // por inclusión de substring sobre NombreOrganismo.
+  compradores_ambientales: [
+    'PARQUE METROPOLITANO',
+    'CORPORACION NACIONAL FORESTAL', 'CONAF',
+    'MINISTERIO DEL MEDIO AMBIENTE', 'SUBSECRETARIA DEL MEDIO AMBIENTE',
+    'SERVICIO DE BIODIVERSIDAD', 'SERVICIO DE EVALUACION AMBIENTAL',
+    'SUPERINTENDENCIA DEL MEDIO AMBIENTE',
+    'SERVICIO AGRICOLA Y GANADERO',
+    'PARQUE CORDILLERA',
+    'INSTITUTO FORESTAL', 'INFOR',
+    'COMISION NACIONAL DE RIEGO',
+    'DIRECCION GENERAL DE AGUAS',
+    'MINISTERIO DE AGRICULTURA',
+    'FUNDACION PARA LA INNOVACION AGRARIA',
+    'BIENES NACIONALES',
+  ],
 };
+
+// ── Versión del filtro de perfil ─────────────────────────────────
+// Al ampliar el perfil, las licitaciones que el filtro viejo marcó como
+// "no Robles" quedarían bloqueadas para siempre por el caché y por el
+// índice compartido del equipo. Toda clasificación NEGATIVA anterior a
+// esta fecha se ignora y se vuelve a evaluar con las reglas nuevas.
+// Si vuelves a ampliar el perfil, sube esta fecha.
+const FILTRO_VERSION    = 2;
+const FILTRO_VERSION_TS = new Date('2026-08-21T00:00:00').getTime();
 
 // ================================================================
 //  CONFIG & ESTADO GLOBAL
@@ -1281,6 +1413,10 @@ async function bajarIndiceCompartido() {
     let n = 0;
     for (const cod in lics) {
       const e = lics[cod];
+      // v2: una clasificación NEGATIVA hecha con el filtro viejo no vale.
+      // Se ignora para que la licitación se vuelva a evaluar con las
+      // reglas nuevas (obras condicionadas + red de seguridad por texto).
+      if (e.robles === false && (e.ts || 0) < FILTRO_VERSION_TS) { continue; }
       if (e.robles === false && !(cod in cacheNoRobles)) { cacheNoRobles[cod] = e.ts || Date.now(); n++; }
       else if (e.robles === true && !(cod in cacheSiRobles)) { cacheSiRobles[cod] = { det: e.det || {}, ts: e.ts || Date.now() }; n++; }
     }
@@ -1343,40 +1479,132 @@ function esCatAmbiental(catStr) {
   return CAT_KW_AMBIENTAL.some(k => t.includes(k));
 }
 
-// Determina si una licitación pertenece al perfil Robles.
-// Prioridad: CodigoProducto exacto → fallback prefijo CodigoCategoria.
-function tieneUnspscPerfil(l) {
-  if (!l.Items?.Listado?.length) return false;
+// ── Texto y comprador ────────────────────────────────────────────
+// Texto completo de la licitación, normalizado (minúsculas, sin tildes)
+// para que 'restauración' y 'restauracion' matcheen igual.
+function normTxt(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+function textoLic(l) {
+  const items = (l.Items?.Listado || []).map(i => `${i.NombreProducto||''} ${i.Descripcion||''}`).join(' ');
+  return normTxt(`${l.Nombre||''} ${l.Descripcion||''} ${items}`);
+}
+function ctxFuerte(l) {
+  const t = textoLic(l);
+  return PERFIL.ctx_fuerte.filter(k => t.includes(normTxt(k)));
+}
+function ctxDebil(l) {
+  const t = textoLic(l);
+  return PERFIL.ctx_debil.filter(k => t.includes(normTxt(k)));
+}
+function esCompradorAmbiental(l) {
+  const org = normTxt(`${l.Comprador?.NombreOrganismo || ''} ${l.Comprador?.NombreUnidad || ''}`);
+  return PERFIL.compradores_ambientales.some(c => org.includes(normTxt(c)));
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  CLASIFICADOR DE PERFIL — 3 estados (v2, 21-08-2026)
+// ══════════════════════════════════════════════════════════════════
+// Devuelve { v: 'si' | 'revisar' | 'no', motivo: string }
+//
+//   'si'      → perfil Robles confirmado, se muestra normal
+//   'revisar' → el UNSPSC no calza pero el contexto dice que puede
+//               interesar. Se MUESTRA con badge, no se descarta.
+//   'no'      → fuera de perfil
+//
+// El problema que resuelve: el filtro anterior dependía 100% del código
+// UNSPSC que le puso el comprador. La consultoría 607-62-LE26 del
+// PARQUEMET venía clasificada como '30222054 Sendero de caminantes',
+// familia "Artículos para estructuras y construcciones", y se descartó
+// pese a decir CONSULTORÍA, SENDEROS y ÁREAS FORESTALES en el título.
+function clasificarPerfil(l) {
+  if (!l.Items?.Listado?.length) return { v: 'no', motivo: 'sin ítems' };
   const items = l.Items.Listado;
 
-  let hayProductoConocido = false;
-  let hayMatchProducto    = false;
-  let hayExclusionTotal   = 0;
+  const conCodigo = items.filter(i => {
+    const c = String(i.CodigoProducto || '').trim(); return c && c !== '0';
+  });
+
+  let matchDirecto  = null;
+  let matchObra     = null;
+  let nExclusiones  = 0;
 
   for (const item of items) {
     const codP = String(item.CodigoProducto || '').trim();
     if (!codP || codP === '0') continue;
-    hayProductoConocido = true;
-    if (PERFIL.productos_robles.has(codP))  { hayMatchProducto  = true; break; }
-    if (PERFIL.productos_excluir.has(codP)) { hayExclusionTotal++; }
+    if (PERFIL.productos_robles.has(codP))     { matchDirecto = codP; break; }
+    if (PERFIL.obras_condicionadas.has(codP))  { matchObra    = matchObra || codP; }
+    if (PERFIL.productos_excluir.has(codP))    { nExclusiones++; }
   }
 
-  // Si hay al menos un producto exacto del perfil → PASS
-  if (hayMatchProducto) return true;
+  // ── 1. Match exacto con el perfil → SÍ ──────────────────────────
+  if (matchDirecto) return { v: 'si', motivo: `UNSPSC ${matchDirecto} del perfil` };
 
-  // Si todos los ítems con código conocido son exclusiones → FAIL
-  if (hayProductoConocido && hayExclusionTotal === items.filter(i => {
-    const c = String(i.CodigoProducto || '').trim(); return c && c !== '0';
-  }).length) return false;
+  const fuerte = ctxFuerte(l);
+  const debil  = ctxDebil(l);
+  const compAmb = esCompradorAmbiental(l);
 
-  // Fallback: prefijo de CodigoCategoria (para ítems sin CodigoProducto)
-  return items.some(item => {
+  // ── 2. Obra o bien genérico → lo resuelve el CONTEXTO ───────────
+  // Acá es donde se "desglosa" construcción: una obra civil con senderos
+  // y parque metropolitano en el texto es Robles; una obra civil a secas
+  // es un edificio y no nos sirve.
+  if (matchObra) {
+    if (fuerte.length) return { v: 'si', motivo: `obra ${matchObra} + contexto: ${fuerte.slice(0,3).join(', ')}` };
+    if (compAmb || debil.length)
+      return { v: 'revisar', motivo: `obra ${matchObra}${compAmb ? ' · comprador ambiental' : ''}${debil.length ? ' · ' + debil.slice(0,2).join(', ') : ''}` };
+    return { v: 'no', motivo: `obra genérica ${matchObra} sin contexto natural` };
+  }
+
+  // ── 3. Todos los ítems conocidos son exclusiones ────────────────
+  // Antes esto era un NO seco. Ahora, si además el texto es fuertemente
+  // ambiental, se deja pasar como REVISAR: puede ser un código mal puesto.
+  if (conCodigo.length && nExclusiones === conCodigo.length) {
+    if (fuerte.length >= 2) return { v: 'revisar', motivo: `código excluido pero contexto fuerte: ${fuerte.slice(0,3).join(', ')}` };
+    return { v: 'no', motivo: 'todos los ítems en lista de exclusión' };
+  }
+
+  // ── 4. Fallback por prefijo de CodigoCategoria ──────────────────
+  const porPrefijo = items.some(item => {
     const codP = String(item.CodigoProducto || '').trim();
-    // No contar ítems cuyo producto esté en la lista de exclusión
     if (codP && codP !== '0' && PERFIL.productos_excluir.has(codP)) return false;
     const cat = String(item.CodigoCategoria || '');
     return PERFIL.unspsc_alta.some(p => cat.startsWith(p));
   });
+  if (porPrefijo) return { v: 'si', motivo: 'familia UNSPSC del perfil' };
+
+  // ── 5. RED DE SEGURIDAD POR TEXTO ───────────────────────────────
+  // El UNSPSC no dice nada útil. Si el texto es claramente de nuestro
+  // rubro, o el comprador es un organismo ambiental y hay al menos una
+  // señal, no se pierde: va a REVISAR.
+  if (fuerte.length >= 2) return { v: 'revisar', motivo: `texto: ${fuerte.slice(0,3).join(', ')}` };
+  if (compAmb && (fuerte.length || debil.length >= 2))
+    return { v: 'revisar', motivo: `comprador ambiental + ${[...fuerte, ...debil].slice(0,2).join(', ')}` };
+
+  return { v: 'no', motivo: 'sin match UNSPSC ni contexto' };
+}
+
+// Clasificación memoizada. clasificarPerfil() normaliza el texto completo
+// y corre ~90 búsquedas de keywords; renderCards() se llama en cada cambio
+// de filtro sobre miles de licitaciones, así que el resultado se cachea en
+// el propio objeto. Se invalida solo si cambia el detalle (_detalleOk).
+function perfilDe(l) {
+  if (l._perfil && l._perfilCalcOk === l._detalleOk) return l._perfil;
+  const r = clasificarPerfil(l);
+  l._perfil = r.v;
+  l._perfilMotivo = r.motivo;
+  l._perfilCalcOk = l._detalleOk;
+  return r.v;
+}
+
+// Compatibilidad: el resto del código llama a tieneUnspscPerfil().
+// Ahora 'revisar' también cuenta como dentro del perfil, para que estas
+// licitaciones se muestren en vez de desaparecer.
+function tieneUnspscPerfil(l) {
+  return perfilDe(l) !== 'no';
+}
+// Solo las confirmadas, sin las de revisar.
+function esPerfilConfirmado(l) {
+  return perfilDe(l) === 'si';
 }
 
 // Indexar categorías Y productos de una licitación recién cargada
@@ -1508,7 +1736,9 @@ function cargarCacheResultados() {
       const obj = JSON.parse(rawN);
       // Purgar entradas expiradas
       for (const k of Object.keys(obj)) {
-        if (ahora - obj[k] < CACHE_TTL_DESC) cacheNoRobles[k] = obj[k];
+        // v2: además del TTL, se descarta todo veredicto negativo anterior
+        // a la ampliación del perfil.
+        if (ahora - obj[k] < CACHE_TTL_DESC && obj[k] >= FILTRO_VERSION_TS) cacheNoRobles[k] = obj[k];
       }
     }
     const rawS = localStorage.getItem(LS_SI_ROBLES);
@@ -2021,8 +2251,13 @@ function renderCard(l) {
 
       <div class="card-titulo">
         <a href="${linkMP(l.CodigoExterno)}" target="_blank" rel="noopener">${l.Nombre || 'Sin título'}</a>
+        ${l._perfil === 'revisar'
+          ? `<span class="tag" style="background:#F5E6C8;color:#7A5A16;border:1px solid #D9B96B;font-size:0.7rem"
+                   title="El código UNSPSC no calza con el perfil, pero el contexto sugiere que puede interesar. Motivo: ${(l._perfilMotivo||'').replace(/"/g,'')}">🔍 REVISAR</span>` : ''}
         ${reclamos ? `<span class="tag tag-excluido" style="font-size:0.7rem">${reclamos}</span>` : ''}
       </div>
+      ${l._perfil === 'revisar' && l._perfilMotivo
+        ? `<div class="card-meta" style="margin-top:2px;font-size:0.74rem;color:#7A5A16">↳ ${l._perfilMotivo}</div>` : ''}
 
       <!-- Organismo -->
       <div class="card-meta">
@@ -2473,6 +2708,10 @@ async function cargarDetalles() {
       // MP deja FechaCierre nula en el detalle; la real está en Fechas.FechaCierre
       if (!l.FechaCierre && l.Fechas?.FechaCierre) { l.FechaCierre = l.Fechas.FechaCierre; l._dias = diasRestantes(l.FechaCierre); }
       l._detalleOk = true;
+      const clasC = clasificarPerfil(l);
+      l._perfil = clasC.v;
+      l._perfilMotivo = clasC.motivo;
+      l._perfilCalcOk = true;
       const scoreNuevo = calcularScore(l);
       l._score = scoreNuevo;
       l._rel   = relevanciaCls(scoreNuevo);
@@ -2510,15 +2749,26 @@ async function cargarDetalles() {
           indexarCategorias(l);
 
           // ── Guardar en caché según resultado UNSPSC ───────────
-          const esRobles = tieneUnspscPerfil(l);
-          if (esRobles) {
+          // v2: 3 estados. Las 'revisar' NO se cachean como descartadas,
+          // porque el veredicto lo tiene que dar una persona.
+          const clas = clasificarPerfil(l);
+          l._perfil = clas.v;
+          l._perfilMotivo = clas.motivo;
+          l._perfilCalcOk = true;
+          if (clas.v === 'si') {
             cacheSiRobles[cod] = { det, ts: Date.now() };
-          } else {
+          } else if (clas.v === 'no') {
             cacheNoRobles[cod] = Date.now();
             if (filtroUnspsc) { l._desc = true; }
           }
           // Registrar para la libreta compartida del equipo (se sube en lote).
-          registrarClasificacion(cod, esRobles, l.Estado || l.CodigoEstado || '');
+          // v2: las 'revisar' NO se registran en el índice compartido. Su
+          // veredicto lo da una persona; si se subieran como true/false
+          // quedarían congeladas para todo el equipo con un juicio que
+          // nadie tomó. Se re-evalúan en cada corrida.
+          if (clas.v !== 'revisar') {
+            registrarClasificacion(cod, clas.v === 'si', l.Estado || l.CodigoEstado || '');
+          }
 
           if (scoreNuevo === 0 && !filtroUnspsc) { l._desc = true; }
 
@@ -2542,11 +2792,13 @@ async function cargarDetalles() {
   guardarCacheProductos();    // guardar catálogo de categorías
   guardarCacheResultados();   // guardar aprobadas/descartadas
   subirIndiceCompartido();    // + subir en lote a la libreta compartida del equipo
-  const roblesCount    = licitaciones.filter(l => l._detalleOk && tieneUnspscPerfil(l)).length;
+  const roblesCount    = licitaciones.filter(l => l._detalleOk && l._perfil === 'si').length;
+  const revisarCount   = licitaciones.filter(l => l._detalleOk && l._perfil === 'revisar').length;
   const analizadasCount = licitaciones.filter(l => l._detalleOk).length;
   const cacheMsg = cacheHits > 0 ? ` (${cacheHits} del caché)` : '';
+  const revisarMsg = revisarCount > 0 ? ` · 🔍 ${revisarCount} para revisar` : '';
   estadoEl.textContent = filtroUnspsc
-    ? `✅ ${roblesCount} licitaciones Robles encontradas (de ${analizadasCount} analizadas${cacheMsg}).`
+    ? `✅ ${roblesCount} licitaciones Robles encontradas${revisarMsg} (de ${analizadasCount} analizadas${cacheMsg}).`
     : `${analizadasCount} licitaciones con detalle completo${cacheMsg}.`;
   document.getElementById('ts').textContent = `Actualizado: ${new Date().toLocaleTimeString('es-CL')}`;
 }
