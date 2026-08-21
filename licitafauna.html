@@ -166,6 +166,28 @@
     }
     .filtro-date:focus { outline: none; border-color: var(--verde); }
 
+    /* ── Búsqueda acumulativa por palabras clave ─────────────── */
+    .kw-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 6px 4px 11px; border-radius: 20px;
+      background: #E8F0EA; border: 1.5px solid #7FA88B; color: #24503A;
+      font-size: 0.78rem; font-weight: 600; white-space: nowrap;
+    }
+    .kw-chip button {
+      border: none; background: #7FA88B; color: #fff; cursor: pointer;
+      width: 16px; height: 16px; border-radius: 50%; line-height: 1;
+      font-size: 0.72rem; padding: 0; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .kw-chip button:hover { background: #24503A; }
+    .kw-vacio { font-size: 0.78rem; color: #999; font-style: italic; }
+    /* Badges de veredicto de perfil */
+    .vd { font-size: 0.68rem; font-weight: 700; padding: 2px 7px;
+          border-radius: 10px; white-space: nowrap; }
+    .vd-si      { background:#DCEFE1; color:#1B5E36; border:1px solid #7FA88B; }
+    .vd-revisar { background:#F5E6C8; color:#7A5A16; border:1px solid #D9B96B; }
+    .vd-no      { background:#EFEFEF; color:#777;    border:1px solid #CFCFCF; }
+
     /* ── PANEL CATEGORÍAS ── */
     #categoriasPanel {
       display: none;
@@ -622,6 +644,25 @@
       <span style="color:#ccc;font-size:1rem">│</span>
       <button class="ftag active-ambiental" id="btnUnspsc" onclick="toggleUnspsc(this)" title="Filtra por los códigos UNSPSC exactos del perfil Robles (CodigoProducto). Activo por defecto.">🌿 Solo Robles</button>
       <button class="ftag" id="btnPerfil" onclick="togglePerfilPanel()" title="Ver los 58 códigos UNSPSC del perfil Robles de Cantillana">📋 Perfil Robles</button>
+    </div>
+
+    <!-- Fila 2: Búsqueda acumulativa por palabras clave (solo Mercado Público) -->
+    <div class="filtro-row" id="kwRow" style="margin-top:8px">
+      <span class="toolbar-label">🔎 Palabras clave:</span>
+      <input type="text" id="kwInput" class="filtro-date" style="width:190px"
+             placeholder="escribe y Enter para sumar"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();agregarKw();}">
+      <button class="ftag" onclick="agregarKw()" title="Suma esta palabra a la búsqueda. Puedes acumular todas las que quieras.">➕ Sumar</button>
+      <button class="ftag" id="btnKwModo" onclick="toggleKwModo()"
+              title="CUALQUIERA: muestra las que tengan al menos una de las palabras. TODAS: solo las que tengan todas.">
+        Coincide: cualquiera
+      </button>
+      <button class="ftag" onclick="limpiarKw()" title="Quita todas las palabras clave.">🗑️ Limpiar</button>
+      <span style="color:#ccc;font-size:1rem">│</span>
+      <span id="kwChips"><span class="kw-vacio">sin palabras — se muestran los resultados normales del perfil</span></span>
+    </div>
+    <div class="filtro-row" id="kwResumen" style="margin-top:6px;display:none">
+      <span class="toolbar-label" id="kwResumenTxt"></span>
     </div>
   </div>
 
@@ -1596,6 +1637,109 @@ function perfilDe(l) {
   return r.v;
 }
 
+// ══════════════════════════════════════════════════════════════════
+//  BÚSQUEDA ACUMULATIVA POR PALABRAS CLAVE (v2, 21-08-2026)
+// ══════════════════════════════════════════════════════════════════
+// Busca dentro de lo que YA está en memoria/caché (el array `licitaciones`,
+// que contiene TODAS las activas descargadas, no solo las del perfil).
+// Ojo: la API de Mercado Público NO soporta búsqueda por palabra — el
+// parámetro ?palabra= devuelve vacío. Por eso el filtrado es local.
+//
+// Acumulativa: cada palabra se suma como chip y se puede combinar con
+// modo CUALQUIERA (unión) o TODAS (intersección).
+//
+// Cuando hay palabras activas se ignoran el filtro de perfil y el de
+// descartadas: se muestra TODO lo que coincida, con el veredicto
+// (SÍ / REVISAR / NO) visible en cada tarjeta. Buscar por palabra es
+// justamente para encontrar lo que el perfil dejó fuera.
+let kwBusqueda = [];          // Array<string> normalizadas
+let kwModoTodas = false;      // false = cualquiera (OR) · true = todas (AND)
+const LS_KW = 'lf_kw_busqueda_v1';
+
+function guardarKw() {
+  try { localStorage.setItem(LS_KW, JSON.stringify({ kw: kwBusqueda, todas: kwModoTodas })); } catch(e){}
+}
+function cargarKw() {
+  try {
+    const raw = localStorage.getItem(LS_KW);
+    if (!raw) return;
+    const o = JSON.parse(raw);
+    kwBusqueda  = Array.isArray(o.kw) ? o.kw : [];
+    kwModoTodas = !!o.todas;
+  } catch(e){}
+}
+
+function agregarKw() {
+  const inp = document.getElementById('kwInput');
+  if (!inp) return;
+  // Permite pegar varias de una: "sendero, mirador; parque"
+  const partes = inp.value.split(/[,;]+/).map(s => normTxt(s).trim()).filter(Boolean);
+  let agregadas = 0;
+  for (const p of partes) {
+    if (p.length < 2) continue;
+    if (kwBusqueda.includes(p)) continue;
+    kwBusqueda.push(p);
+    agregadas++;
+  }
+  inp.value = '';
+  inp.focus();
+  if (agregadas) { guardarKw(); renderKwChips(); renderCards(); }
+}
+
+function quitarKw(i) {
+  kwBusqueda.splice(i, 1);
+  guardarKw(); renderKwChips(); renderCards();
+}
+
+function limpiarKw() {
+  kwBusqueda = [];
+  guardarKw(); renderKwChips(); renderCards();
+}
+
+function toggleKwModo() {
+  kwModoTodas = !kwModoTodas;
+  const b = document.getElementById('btnKwModo');
+  if (b) {
+    b.textContent = kwModoTodas ? 'Coincide: todas' : 'Coincide: cualquiera';
+    kwModoTodas ? b.classList.add('active') : b.classList.remove('active');
+  }
+  guardarKw(); renderCards();
+}
+
+function renderKwChips() {
+  const cont = document.getElementById('kwChips');
+  if (!cont) return;
+  if (!kwBusqueda.length) {
+    cont.innerHTML = `<span class="kw-vacio">sin palabras — se muestran los resultados normales del perfil</span>`;
+    const res = document.getElementById('kwResumen');
+    if (res) res.style.display = 'none';
+    return;
+  }
+  cont.innerHTML = kwBusqueda.map((k, i) =>
+    `<span class="kw-chip">${k}<button onclick="quitarKw(${i})" title="Quitar">✕</button></span>`
+  ).join(' ');
+}
+
+// Texto sobre el que se busca: título siempre; descripción, organismo y
+// nombres de producto solo si ya cargó el detalle.
+function textoBusqueda(l) {
+  let t = normTxt(l.Nombre || '');
+  if (l._detalleOk) {
+    const items = (l.Items?.Listado || [])
+      .map(i => `${i.NombreProducto || ''} ${i.Descripcion || ''}`).join(' ');
+    t += ' ' + normTxt(`${l.Descripcion || ''} ${l.Comprador?.NombreOrganismo || ''} ${items}`);
+  }
+  return t;
+}
+
+function coincideKw(l) {
+  if (!kwBusqueda.length) return true;
+  const t = textoBusqueda(l);
+  return kwModoTodas
+    ? kwBusqueda.every(k => t.includes(k))
+    : kwBusqueda.some(k => t.includes(k));
+}
+
 // Compatibilidad: el resto del código llama a tieneUnspscPerfil().
 // Ahora 'revisar' también cuenta como dentro del perfil, para que estas
 // licitaciones se muestren en vez de desaparecer.
@@ -2120,15 +2264,24 @@ function renderCards() {
   if (fuenteActiva === 'pnud') return renderCardsPNUD();
   if (fuenteActiva === 'biofin') return renderCardsBIOFIN();
   const cont = document.getElementById('resultados');
+  const buscando = kwBusqueda.length > 0;
   const visible = licitaciones.filter(l => {
-    if (l._desc) return false;
+    // ── Búsqueda por palabras clave ───────────────────────────────
+    // Manda sobre todo lo demás: si hay palabras activas, se ignoran el
+    // filtro de perfil y el de descartadas. La idea es poder encontrar
+    // justamente lo que el perfil dejó fuera.
+    if (buscando) {
+      if (!coincideKw(l)) return false;
+    } else {
+      if (l._desc) return false;
+    }
 
     // ── Filtro relevancia ─────────────────────────────────────────
     if (filtroActivo !== 'todas' && l._rel !== filtroActivo) return false;
 
     // ── Filtro UNSPSC perfil Robles (toggle) ─────────────────────
     // Si está activo: ocultar hasta que cargue el detalle y pase el filtro de producto
-    if (filtroUnspsc && (!l._detalleOk || !tieneUnspscPerfil(l))) return false;
+    if (!buscando && filtroUnspsc && (!l._detalleOk || !tieneUnspscPerfil(l))) return false;
 
     // ── Filtro por categoría UNSPSC seleccionada ──────────────────
     if (filtroCategoria !== null) {
@@ -2155,8 +2308,32 @@ function renderCards() {
     return true;
   });
 
+  // ── Resumen de la búsqueda por palabras ────────────────────────
+  const resEl = document.getElementById('kwResumen');
+  const resTx = document.getElementById('kwResumenTxt');
+  if (resEl && resTx) {
+    if (buscando) {
+      const nSi  = visible.filter(l => l._detalleOk && perfilDe(l) === 'si').length;
+      const nRev = visible.filter(l => l._detalleOk && perfilDe(l) === 'revisar').length;
+      const nNo  = visible.filter(l => l._detalleOk && perfilDe(l) === 'no').length;
+      const nPend = visible.filter(l => !l._detalleOk).length;
+      resEl.style.display = 'flex';
+      resTx.innerHTML =
+        `${visible.length} coincidencia(s) con <strong>${kwBusqueda.join(kwModoTodas ? ' + ' : ' / ')}</strong>` +
+        ` · ✅ ${nSi} perfil · 🔍 ${nRev} revisar · ➖ ${nNo} fuera de perfil` +
+        (nPend ? ` · ⏳ ${nPend} sin detalle (solo se buscó en el título)` : '') +
+        ` — <em>el filtro de perfil está en pausa mientras buscas</em>`;
+    } else {
+      resEl.style.display = 'none';
+    }
+  }
+
   if (visible.length === 0) {
-    cont.innerHTML = `<div class="empty"><div class="icon">🍃</div><p>No hay resultados para este filtro.</p></div>`;
+    cont.innerHTML = buscando
+      ? `<div class="empty"><div class="icon">🔎</div><p>Ninguna licitación descargada coincide con <strong>${kwBusqueda.join(kwModoTodas ? ' + ' : ' / ')}</strong>.</p>
+         <p style="font-size:0.82rem;color:#888">Se buscó en el título de todas las activas y en la descripción de las que ya tienen detalle cargado.
+         Si esperabas encontrar algo, puede que aún no se descargue su detalle, o que la búsqueda no se haya corrido hoy.</p></div>`
+      : `<div class="empty"><div class="icon">🍃</div><p>No hay resultados para este filtro.</p></div>`;
     return;
   }
 
@@ -2184,6 +2361,27 @@ function renderCard(l) {
     else if (dias <= 7)  diasHtml = `<span class="dias-badge dias-urgente">⚡ ${dias}d</span>`;
     else if (dias <= 21) diasHtml = `<span class="dias-badge dias-pronto">${dias}d</span>`;
     else                 diasHtml = `<span class="dias-badge dias-ok">${dias}d</span>`;
+  }
+
+  // ── Badge de veredicto de perfil ────────────────────────────────
+  // REVISAR se muestra siempre (es una alerta de que hay que decidir).
+  // SÍ y NO solo aparecen durante una búsqueda por palabras clave, que
+  // es cuando conviven en pantalla licitaciones dentro y fuera del perfil.
+  const vd = l._detalleOk ? perfilDe(l) : null;
+  const buscandoKw = kwBusqueda.length > 0;
+  let vdHtml = '', vdMotivo = '';
+  if (vd === 'revisar') {
+    vdHtml = `<span class="vd vd-revisar" title="El código UNSPSC no calza con el perfil, pero el contexto sugiere que puede interesar.">🔍 REVISAR</span>`;
+  } else if (buscandoKw && vd === 'si') {
+    vdHtml = `<span class="vd vd-si" title="Dentro del perfil Robles.">✅ PERFIL</span>`;
+  } else if (buscandoKw && vd === 'no') {
+    vdHtml = `<span class="vd vd-no" title="Fuera del perfil Robles. Aparece porque coincide con tu búsqueda.">➖ FUERA DE PERFIL</span>`;
+  } else if (buscandoKw && !l._detalleOk) {
+    vdHtml = `<span class="vd vd-no" title="Todavía no se descarga el detalle: solo se buscó en el título.">⏳ SIN DETALLE</span>`;
+  }
+  if (vdHtml && l._perfilMotivo && (vd === 'revisar' || buscandoKw)) {
+    const color = vd === 'si' ? '#1B5E36' : vd === 'revisar' ? '#7A5A16' : '#888';
+    vdMotivo = `<div class="card-meta" style="margin-top:2px;font-size:0.74rem;color:${color}">↳ ${l._perfilMotivo}</div>`;
   }
 
   // Tags
@@ -2251,13 +2449,10 @@ function renderCard(l) {
 
       <div class="card-titulo">
         <a href="${linkMP(l.CodigoExterno)}" target="_blank" rel="noopener">${l.Nombre || 'Sin título'}</a>
-        ${l._perfil === 'revisar'
-          ? `<span class="tag" style="background:#F5E6C8;color:#7A5A16;border:1px solid #D9B96B;font-size:0.7rem"
-                   title="El código UNSPSC no calza con el perfil, pero el contexto sugiere que puede interesar. Motivo: ${(l._perfilMotivo||'').replace(/"/g,'')}">🔍 REVISAR</span>` : ''}
+        ${vdHtml}
         ${reclamos ? `<span class="tag tag-excluido" style="font-size:0.7rem">${reclamos}</span>` : ''}
       </div>
-      ${l._perfil === 'revisar' && l._perfilMotivo
-        ? `<div class="card-meta" style="margin-top:2px;font-size:0.74rem;color:#7A5A16">↳ ${l._perfilMotivo}</div>` : ''}
+      ${vdMotivo}
 
       <!-- Organismo -->
       <div class="card-meta">
@@ -3246,6 +3441,13 @@ function cambiarFuente(f){
   if(bU) bU.style.display = (f === 'mp') ? '' : 'none';
   const bPf = document.getElementById('btnPerfil');
   if(bPf) bPf.style.display = (f === 'mp') ? '' : 'none';
+  // La búsqueda por palabras clave opera sobre el array de Mercado Público.
+  // En las otras fuentes renderCards() delega en su propio render y la caja
+  // no haría nada, así que se oculta en vez de quedar muerta en pantalla.
+  const kwR = document.getElementById('kwRow');
+  if (kwR) kwR.style.display = (f === 'mp') ? 'flex' : 'none';
+  const kwRes = document.getElementById('kwResumen');
+  if (kwRes && f !== 'mp') kwRes.style.display = 'none';
   if(f !== 'mp' && perfilPanelVisible) togglePerfilPanel();
 
   const arr = (f === 'ungm') ? licitacionesUNGM : (f === 'bid') ? licitacionesBID : (f === 'caf') ? licitacionesCAF : (f === 'wwf') ? licitacionesWWF : (f === 'ci') ? licitacionesCI : (f === 'uicn') ? licitacionesUICN : (f === 'pnud') ? licitacionesPNUD : (f === 'biofin') ? licitacionesBIOFIN : licitaciones;
@@ -4976,6 +5178,10 @@ async function evaluarBID(codigo, btn, noticeId){
     cargarCacheLocal();         // categoriaIndex desde localStorage
     cargarCacheProductos();     // productoIndex + perfilProductosCods
     cargarCacheResultados();    // cacheNoRobles + cacheSiRobles
+    cargarKw();                 // palabras clave acumuladas de la sesión anterior
+    renderKwChips();
+    const bKw = document.getElementById('btnKwModo');
+    if (bKw && kwModoTodas) { bKw.textContent = 'Coincide: todas'; bKw.classList.add('active'); }
     bajarIndiceCompartido();    // + libreta compartida del equipo (async, no bloquea)
   } catch(e) { /* silencioso */ }
 })();
