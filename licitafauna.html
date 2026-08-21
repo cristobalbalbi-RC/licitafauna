@@ -3065,6 +3065,11 @@ function limpiarFechas() {
 // Por eso una licitación sin detalle se ve "pelada", solo con su nombre.
 const detallesEnCurso = new Set();   // evita pedir dos veces el mismo código
 
+// La pausa de 700 ms existe para no gatillar el 429 de Mercado Público.
+// Si la ficha salió del disco, MP no se tocó y no hay nada que respetar:
+// dormir igual convertía una búsqueda instantánea en dos horas de espera.
+let ultimoDetalleDesdeDisco = false;
+
 async function fetchDetalleLic(l) {
   const cod = l.CodigoExterno;
   if (!cod || l._detalleOk || detallesEnCurso.has(cod)) return false;
@@ -3075,6 +3080,9 @@ async function fetchDetalleLic(l) {
       : `${API_BASE}?ticket=${PERFIL.ticket}&codigo=${encodeURIComponent(cod)}`;
     const r = await fetch(ep, { signal: AbortSignal.timeout(10000) });
     if (!r.ok) return false;
+    // ¿La ficha vino del disco o hubo que ir a MP? El servidor lo dice en
+    // esta cabecera. Sirve para no dormir 700 ms cuando no hizo falta.
+    ultimoDetalleDesdeDisco = (r.headers.get('X-LicitaFauna-Cache') === 'DISK');
     const det = (await r.json()).Listado?.[0];
     if (!det) return false;
 
@@ -3166,7 +3174,9 @@ async function cargarDetallesKw() {
     const t = txt();
     if (t) t.innerHTML = `⏳ Bajando de MP las que faltan en el caché… ${i + 1}/${tope}` +
       (pend.length > tope ? ` (hay ${pend.length - tope} más — conviene construir el caché completo)` : '');
-    await new Promise(res => setTimeout(res, 700));   // rate limit de MP (429)
+    if (!ultimoDetalleDesdeDisco) {
+      await new Promise(res => setTimeout(res, 700));  // rate limit de MP (429)
+    }
   }
 
   kwCargandoDetalles = false;
@@ -3184,6 +3194,7 @@ async function cargarDetalles() {
   const total = licitaciones.length;
   let cargados = 0;
   let cacheHits = 0;
+  let discoHits = 0;   // fichas servidas por el almacén local, sin tocar MP
 
   for (const l of licitaciones) {
     if (l._detalleOk) continue;  // ya tiene detalle
@@ -3240,9 +3251,15 @@ async function cargarDetalles() {
     }
 
     cargados++;
-    estadoEl.textContent = `Cargando detalles ${cargados}/${total}… (${cacheHits} del caché)`;
+    if (ultimoDetalleDesdeDisco) discoHits++;
+    estadoEl.textContent = `Cargando detalles ${cargados}/${total}… ` +
+      `(${cacheHits} del caché${discoHits ? `, ${discoHits} del disco` : ''})`;
 
-    await new Promise(res => setTimeout(res, 700));  // respetar rate limit de MP (429)
+    // Solo esperar si de verdad se molestó a MP. Con el caché construido
+    // esto convierte el recorrido completo de ~2 horas en menos de un minuto.
+    if (!ultimoDetalleDesdeDisco) {
+      await new Promise(res => setTimeout(res, 700));  // rate limit de MP (429)
+    }
   }
 
   // Re-ordenar y re-renderizar final
