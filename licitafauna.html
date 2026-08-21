@@ -1436,6 +1436,17 @@ const PROXIES_EXT = [
 // Desde file:// el intento directo siempre falla por CORS → forzar proxy
 let usarProxy = (location.protocol === 'file:' || EN_LOCAL);
 let licitaciones = [];       // todas las licitaciones procesadas
+
+// ── Generación de búsqueda ────────────────────────────────────────
+// "Actualizar búsqueda" reemplaza el arreglo `licitaciones` por uno nuevo,
+// pero cargarDetalles() se lanza sin esperar y no tenía candado: apretar el
+// botón dos veces dejaba DOS recorridos vivos, y el viejo seguía pidiendo
+// fichas de licitaciones que ya nadie muestra. Además de gastar peticiones,
+// duplicaba el ritmo contra MP y provocaba 429.
+//
+// Cada búsqueda toma un número. Los recorridos comparan el suyo contra el
+// actual y se apagan solos cuando quedan obsoletos.
+let generacionBusqueda = 0;
 let filtroActivo     = 'todas';
 let filtroUnspsc     = true;  // ON por defecto: solo licitaciones del perfil Robles
 let filtroFechaDesde = null;
@@ -3205,8 +3216,11 @@ async function completarSinDetalle() {
     }
 
     // ── Paso 2: lo que el disco no tenía, a MP ────────────────────
+    const miGen = generacionBusqueda;
     for (let i = 0; i < pend.length; i++) {
-      if (detenerCompletar) break;
+      // Lo detuvo el usuario, o arrancó una búsqueda nueva que reemplazó
+      // el arreglo: en ambos casos este trabajo ya no sirve.
+      if (detenerCompletar || miGen !== generacionBusqueda) break;
       const l = pend[i];
       const ok = await fetchDetalleLic(l);
       if (ok) { deMP++; actualizarCard(l); } else { fallidas++; }
@@ -3312,8 +3326,10 @@ async function cargarDetallesKw() {
   const tope = Math.min(pend.length, KW_TOPE_DETALLES);
   let hechas = 0;
 
+  const miGenKw = generacionBusqueda;
   for (let i = 0; i < tope; i++) {
     if (!kwBusqueda.length) break;            // el usuario limpió la búsqueda
+    if (miGenKw !== generacionBusqueda) break; // arrancó una búsqueda nueva
     const l = pend[i];
     if (!coincideKw(l)) continue;             // cambiaron las palabras
     const ok = await fetchDetalleLic(l);
@@ -3336,7 +3352,9 @@ async function cargarDetallesKw() {
 // ================================================================
 //  CARGA PROGRESIVA DE DETALLES
 // ================================================================
-async function cargarDetalles() {
+async function cargarDetalles(gen) {
+  // Si no viene generación, es una llamada suelta: toma la actual.
+  if (gen === undefined) gen = generacionBusqueda;
   const estadoEl = document.getElementById('estado');
   const total = licitaciones.length;
   let cargados = 0;
@@ -3344,6 +3362,11 @@ async function cargarDetalles() {
   let discoHits = 0;   // fichas servidas por el almacén local, sin tocar MP
 
   for (const l of licitaciones) {
+    // Se apagó porque arrancó una búsqueda nueva: soltar el trabajo viejo.
+    if (gen !== generacionBusqueda) {
+      console.log('↩️ carga de detalles obsoleta: la reemplazó una búsqueda nueva');
+      return;
+    }
     if (l._detalleOk) continue;  // ya tiene detalle
 
     const cod = l.CodigoExterno;
@@ -3706,6 +3729,10 @@ async function iniciarBusqueda() {
   btn.textContent = '⏳ Cargando…';
   document.getElementById('alertas').innerHTML = '';
 
+  // Nueva generación: cualquier recorrido de detalles que siga vivo de una
+  // búsqueda anterior se dará cuenta y se apagará en su próxima vuelta.
+  const miGen = ++generacionBusqueda;
+
   // Ocultar paneles de categorías/productos (solo visibles en modo exploración)
   categoriaIndex.clear();
   productoIndex.clear();
@@ -3792,8 +3819,8 @@ async function iniciarBusqueda() {
     if (n === 0) {
       showAlert('No se encontraron licitaciones que coincidan con el perfil de Robles.', 'info');
     } else {
-      // Cargar detalles en segundo plano (progresivo)
-      cargarDetalles();
+      // Cargar detalles en segundo plano (progresivo), atada a esta búsqueda
+      cargarDetalles(miGen);
     }
 
   } catch (e) {
