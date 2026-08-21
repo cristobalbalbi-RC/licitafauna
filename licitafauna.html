@@ -627,6 +627,9 @@
   Baja: <strong id="sBaja" style="color:#ef5350">0</strong>
   &nbsp;|&nbsp;
   Descartadas: <strong id="sDesc">0</strong>
+  <span style="display:none">&nbsp;|&nbsp;
+  <span style="color:#A46447">Sin ficha: <strong id="sSinFicha">0</strong></span>
+  </span>
 </div>
 
 <!-- MAIN -->
@@ -674,6 +677,10 @@
         🏗️ Construir caché completo
       </button>
       <button class="ftag" id="btnCacheStop" onclick="detenerCache()" style="display:none">⏹️ Detener</button>
+      <button class="ftag" id="btnCompletar" onclick="completarSinDetalle()"
+              title="Revisa las licitaciones cargadas ahora y baja la ficha de todas las que quedaron sin detalle: las que MP no respondió, las que el recorrido no alcanzó, y las que estaban en el caché de descartadas (que guarda el veredicto, no los datos). Primero busca en el disco; solo lo que falte va a MP.">
+        🩹 Completar sin detalle
+      </button>
       <button class="ftag" id="btnCacheBajar" onclick="bajarCacheEquipo()"
               title="Trae el almacén que ya construyó otra persona del equipo. Fusiona: no borra las fichas que solo tienes tú.">
         📥 Bajar del equipo
@@ -2524,11 +2531,29 @@ function renderCards() {
       const nNo  = visible.filter(l => l._detalleOk && perfilDe(l) === 'no').length;
       const nPend = visible.filter(l => !l._detalleOk).length;
       resEl.style.display = 'flex';
+      // Aviso de filtros que SIGUEN activos y pueden estar escondiendo
+      // coincidencias. La búsqueda por palabra ignora el perfil y las
+      // descartadas a propósito, pero respeta fechas, relevancia y
+      // categoría — y sin avisar parece que la licitación no existe.
+      const otros = [];
+      if (filtroFechaDesde || filtroFechaHasta) {
+        const d = document.getElementById('filtroDesde')?.value;
+        const h = document.getElementById('filtroHasta')?.value;
+        otros.push(`fecha de publicación${d ? ' desde ' + d : ''}${h ? ' hasta ' + h : ''}`);
+      }
+      if (filtroActivo !== 'todas') otros.push(`relevancia ${filtroActivo}`);
+      if (filtroCategoria !== null)  otros.push('categoría UNSPSC');
+      if (filtroProducto !== null)   otros.push('producto UNSPSC');
+
       resTx.innerHTML =
         `${visible.length} coincidencia(s) con <strong>${kwBusqueda.join(kwModoTodas ? ' + ' : ' / ')}</strong>` +
         ` · ✅ ${nSi} perfil · 🔍 ${nRev} revisar · ➖ ${nNo} fuera de perfil` +
         (nPend ? ` · ⏳ ${nPend} sin detalle (solo se buscó en el título)` : '') +
-        ` — <em>el filtro de perfil está en pausa mientras buscas</em>`;
+        ` — <em>el filtro de perfil está en pausa mientras buscas</em>` +
+        (otros.length
+          ? `<br><span style="color:#A46447;font-weight:600">⚠️ Sigue(n) activo(s): ${otros.join(' · ')}.
+             Puede estar escondiendo resultados.</span>`
+          : '');
     } else {
       resEl.style.display = 'none';
     }
@@ -3129,6 +3154,113 @@ async function fetchDetalleLic(l) {
   }
 }
 
+// ══════════════════════════════════════════════════════════════════
+//  PARCHE: completar TODAS las licitaciones sin detalle
+// ══════════════════════════════════════════════════════════════════
+// El barrido del servidor recorre el listado de MP y salta lo que ya
+// tiene. Esto es distinto: mira lo que está cargado en pantalla ahora y
+// busca las que quedaron sin ficha, sea porque MP falló, porque el
+// recorrido no alcanzó a llegar, o porque estaban en el caché de
+// descartadas (que guarda el veredicto, no los datos).
+//
+// Primero pregunta al disco todas de una; solo lo que falte va a MP.
+let completandoSinDetalle = false;
+let detenerCompletar = false;
+
+async function completarSinDetalle() {
+  if (completandoSinDetalle) { detenerCompletar = true; return; }
+  if (!licitaciones.length) {
+    showAlert('Primero aprieta "Buscar licitaciones": no hay nada cargado que completar.', 'info');
+    return;
+  }
+
+  let pend = licitaciones.filter(l => !l._detalleOk);
+  if (!pend.length) {
+    showAlert('✅ Todas las licitaciones cargadas ya tienen su ficha.', 'info');
+    return;
+  }
+
+  completandoSinDetalle = true;
+  detenerCompletar = false;
+  const btn = document.getElementById('btnCompletar');
+  if (btn) btn.textContent = '⏹️ Detener parche';
+  const est = document.getElementById('estado');
+  const total0 = pend.length;
+  let deDisco = 0, deMP = 0, fallidas = 0;
+
+  try {
+    // ── Paso 1: el disco, todas de una sola vez ───────────────────
+    if (EN_LOCAL) {
+      est.textContent = `🩹 Buscando ${total0} fichas en el caché de disco…`;
+      const porCodigo = new Map(pend.map(l => [l.CodigoExterno, l]));
+      const { encontradas } = await fichasDelDisco([...porCodigo.keys()]);
+      for (const det of encontradas) {
+        const l = porCodigo.get(det.CodigoExterno);
+        if (!l) continue;
+        aplicarDetalle(l, det);
+        deDisco++;
+      }
+      if (deDisco) renderCards();
+      pend = pend.filter(l => !l._detalleOk);
+    }
+
+    // ── Paso 2: lo que el disco no tenía, a MP ────────────────────
+    for (let i = 0; i < pend.length; i++) {
+      if (detenerCompletar) break;
+      const l = pend[i];
+      const ok = await fetchDetalleLic(l);
+      if (ok) { deMP++; actualizarCard(l); } else { fallidas++; }
+      est.textContent = `🩹 Completando desde MP ${i + 1}/${pend.length}… ` +
+        `(${deDisco} salieron del disco)`;
+      if (!ultimoDetalleDesdeDisco) {
+        await new Promise(res => setTimeout(res, 700));   // rate limit de MP
+      }
+    }
+
+    actualizarStats();
+    renderCards();
+    guardarCacheResultados();
+    subirIndiceCompartido();
+    publicarCacheSiConviene();   // devolver al equipo lo que se recuperó
+
+    const restantes = licitaciones.filter(l => !l._detalleOk).length;
+    showAlert(
+      `🩹 Parche listo: ${deDisco} del disco · ${deMP} bajadas de MP` +
+      (fallidas ? ` · ${fallidas} no respondieron` : '') +
+      (restantes ? ` · quedan ${restantes} sin ficha (vuelve a intentar)` : ' · no queda ninguna sin ficha'),
+      restantes ? 'error' : 'info');
+    est.textContent = `✅ ${licitaciones.length - restantes}/${licitaciones.length} con ficha completa.`;
+    refrescarEstadoCache();
+  } finally {
+    completandoSinDetalle = false;
+    detenerCompletar = false;
+    if (btn) btn.textContent = '🩹 Completar sin detalle';
+  }
+}
+
+// Vuelca un detalle de MP sobre la licitación y recalcula todo lo derivado.
+// Estaba repetido en tres lugares; acá queda en uno solo.
+function aplicarDetalle(l, det) {
+  Object.assign(l, det);
+  // MP deja FechaCierre nula en el detalle; la real está en Fechas.FechaCierre
+  if (!l.FechaCierre && l.Fechas?.FechaCierre) {
+    l.FechaCierre = l.Fechas.FechaCierre;
+    l._dias = diasRestantes(l.FechaCierre);
+  }
+  l._detalleOk = true;
+  const c = clasificarPerfil(l);
+  l._perfil = c.v;
+  l._perfilMotivo = c.motivo;
+  l._perfilCalcOk = true;
+  l._score = calcularScore(l);
+  l._rel   = relevanciaCls(l._score);
+  indexarCategorias(l);
+  // Si el veredicto es 'no', vuelve a quedar descartada en la vista normal.
+  if (c.v === 'no' && filtroUnspsc) l._desc = true;
+  else l._desc = false;
+  return c.v;
+}
+
 // ── Completar los resultados de una búsqueda por palabras clave ──
 // Las coincidencias suelen ser pocas, así que se pueden completar en
 // segundos en vez de esperar el recorrido de las ~9.700 activas.
@@ -3315,6 +3447,14 @@ function actualizarStats() {
   document.getElementById('sMedia').textContent  = activas.filter(l => l._rel === 'media').length;
   document.getElementById('sBaja').textContent   = activas.filter(l => l._rel === 'baja').length;
   document.getElementById('sDesc').textContent   = fuente.filter(l => l._desc).length;
+
+  // Cuántas quedaron sin ficha. Es el número que ataca el botón 🩹.
+  const sinFicha = document.getElementById('sSinFicha');
+  if (sinFicha) {
+    const n = (fuenteActiva === 'mp') ? licitaciones.filter(l => !l._detalleOk).length : 0;
+    sinFicha.textContent = n;
+    sinFicha.parentElement.style.display = (fuenteActiva === 'mp' && n > 0) ? '' : 'none';
+  }
 }
 
 // ================================================================
