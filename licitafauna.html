@@ -1347,6 +1347,24 @@ const PERFIL = {
   // Contexto FUERTE: si aparece cualquiera de estos en título o descripción,
   // una obra condicionada pasa directo al perfil. Son términos que solo
   // aparecen en el mundo de áreas naturales protegidas y uso público.
+  // v3 (28-09-2026) — SERVICIOS GENÉRICOS. Consultorías, estudios y
+  // servicios que los compradores usan para cualquier cosa. En la comparativa
+  // con MP (25-09) aquí venían EIA, estudios forestales, planes de manejo y
+  // reforestaciones mal clasificadas. Solo entran con contexto FUERTE (→ SÍ);
+  // a diferencia de obras_condicionadas, el contexto débil NO los manda a
+  // REVISAR (los estudios viales del MOP dicen "ambiental" y eran ruido).
+  servicios_condicionados: new Set([
+    '102101001', // Licitación pública de consultoría (código genérico MP)
+    '80101702', // Estudios de productividad y eficacia
+    '80101703', // Consultorías para estandarización de especificaciones
+    '80101505', // Asesorías en gestión estratégica
+    '80111715', // Servicios profesionales (genérico)
+    '80111504', // Formación, capacitación y entrenamiento de personal
+    '41104007', // Toma de muestras de agua
+    '70141705', // Servicios de extensión (CONAF lo usa para planes de manejo)
+    '70111501', // Sembradío de plantas y árboles (MOP lo usa para reforestación)
+  ]),
+
   ctx_fuerte: [
     'sendero', 'senderos', 'senderismo',
     'mirador', 'miradores',
@@ -1359,7 +1377,8 @@ const PERFIL = {
     'quebrada', 'ladera', 'cerro isla', 'precordillera',
     'biodiversidad', 'fauna silvestre', 'flora nativa', 'especies nativas',
     'restauración ecológica', 'restauracion ecologica',
-    'conservación', 'conservacion',
+    // v3: 'conservación' pasó a ctx_debil. En obras públicas significa
+    // mantención (escuelas, caminos, CESFAM): era el 62 % del ruido.
     'ecosistema', 'ecosistemas',
     'forestal', 'forestales',
     'uso público', 'uso publico',
@@ -1370,6 +1389,12 @@ const PERFIL = {
     'cuenca hidrográfica', 'cuenca hidrografica',
     'cortafuego', 'cortafuegos',
     'reforestación', 'reforestacion', 'revegetación', 'revegetacion',
+    // v3 (28-09-2026) — vocabulario tomado de licitaciones relevantes reales
+    // ('replante' no: coincide con "replanteo" topográfico en cualquier obra)
+    'plan de manejo forestal', 'plan de manejo',
+    'bofedales', 'geoparque',
+    'impacto ambiental', 'evaluación ambiental estratégica',
+    'educación ambiental', 'cambio climático',
   ],
 
   // Contexto DÉBIL: sugiere el ámbito pero no lo confirma. Manda a REVISAR.
@@ -1385,12 +1410,22 @@ const PERFIL = {
     'paisaj',
     'cerro', 'cerros',
     'ribera', 'riberas',
+    'conservación', 'conservacion', // v3: movida desde ctx_fuerte
   ],
 
   // Compradores cuyo giro ES el medio ambiente. Si el organismo es uno de
   // estos, cualquier licitación suya que no matchee el UNSPSC igual se
   // muestra como REVISAR en vez de desaparecer. Se compara en MAYÚSCULAS
   // por inclusión de substring sobre NombreOrganismo.
+  // v3 (28-09-2026) — Términos núcleo: uno solo basta para REVISAR en la
+  // red de seguridad por texto (paso 5). Van normalizados (sin tildes).
+  ctx_nucleo: [
+    'reforestacion', 'bosque nativo', 'restauracion ecologica', 'humedal',
+    'vivero', 'viverizacion', 'biodiversidad', 'revegetacion', 'flora nativa',
+    'especies nativas', 'fauna silvestre', 'area protegida', 'bofedal',
+    'plan de manejo forestal', 'impacto ambiental',
+  ],
+
   compradores_ambientales: [
     'PARQUE METROPOLITANO',
     'CORPORACION NACIONAL FORESTAL', 'CONAF',
@@ -1414,8 +1449,8 @@ const PERFIL = {
 // índice compartido del equipo. Toda clasificación NEGATIVA anterior a
 // esta fecha se ignora y se vuelve a evaluar con las reglas nuevas.
 // Si vuelves a ampliar el perfil, sube esta fecha.
-const FILTRO_VERSION    = 2;
-const FILTRO_VERSION_TS = new Date('2026-08-21T00:00:00').getTime();
+const FILTRO_VERSION    = 3;
+const FILTRO_VERSION_TS = new Date('2026-09-28T00:00:00').getTime();
 
 // ================================================================
 //  CONFIG & ESTADO GLOBAL
@@ -1472,8 +1507,8 @@ const LS_PROD_PERFIL = 'lf_prod_perfil_v1';
 // descartadas que escribió la versión anterior se ignora solo, sin que
 // nadie tenga que limpiar nada a mano: entradas guardadas con el filtro
 // viejo dejarían fuera licitaciones que el filtro nuevo sí aprueba.
-const LS_NO_ROBLES = 'lf_no_robles_v2';
-const LS_SI_ROBLES = 'lf_si_robles_v2';
+const LS_NO_ROBLES = 'lf_no_robles_v3';
+const LS_SI_ROBLES = 'lf_si_robles_v3';
 const CACHE_TTL_DESC = 14 * 86400000; // 14 días para descartadas
 const CACHE_TTL_APRO =  7 * 86400000; //  7 días para aprobadas
 let cacheNoRobles = {};  // {CodigoExterno: timestamp}
@@ -1586,11 +1621,13 @@ function textoLic(l) {
 }
 function ctxFuerte(l) {
   const t = textoLic(l);
-  return PERFIL.ctx_fuerte.filter(k => t.includes(normTxt(k)));
+  // v3: normalizado y sin duplicados. Antes 'conservación' y 'conservacion'
+  // contaban como DOS señales fuertes y pasaban la regla fuerte >= 2.
+  return [...new Set(PERFIL.ctx_fuerte.map(normTxt))].filter(k => t.includes(k));
 }
 function ctxDebil(l) {
   const t = textoLic(l);
-  return PERFIL.ctx_debil.filter(k => t.includes(normTxt(k)));
+  return [...new Set(PERFIL.ctx_debil.map(normTxt))].filter(k => t.includes(k));
 }
 function esCompradorAmbiental(l) {
   const org = normTxt(`${l.Comprador?.NombreOrganismo || ''} ${l.Comprador?.NombreUnidad || ''}`);
@@ -1622,6 +1659,7 @@ function clasificarPerfil(l) {
 
   let matchDirecto  = null;
   let matchObra     = null;
+  let matchServ     = null;   // v3: servicio genérico (solo con contexto fuerte)
   let nExclusiones  = 0;
 
   for (const item of items) {
@@ -1629,6 +1667,7 @@ function clasificarPerfil(l) {
     if (!codP || codP === '0') continue;
     if (PERFIL.productos_robles.has(codP))     { matchDirecto = codP; break; }
     if (PERFIL.obras_condicionadas.has(codP))  { matchObra    = matchObra || codP; }
+    if (PERFIL.servicios_condicionados.has(codP)) { matchServ = matchServ || codP; }
     if (PERFIL.productos_excluir.has(codP))    { nExclusiones++; }
   }
 
@@ -1638,6 +1677,11 @@ function clasificarPerfil(l) {
   const fuerte = ctxFuerte(l);
   const debil  = ctxDebil(l);
   const compAmb = esCompradorAmbiental(l);
+
+  // ── 1b. Servicio genérico + contexto fuerte → SÍ (v3) ───────────
+  // Sin contexto fuerte no decide nada: sigue al resto de las reglas.
+  if (matchServ && fuerte.length)
+    return { v: 'si', motivo: `servicio ${matchServ} + contexto: ${fuerte.slice(0,3).join(', ')}` };
 
   // ── 2. Obra o bien genérico → lo resuelve el CONTEXTO ───────────
   // Acá es donde se "desglosa" construcción: una obra civil con senderos
@@ -1671,7 +1715,9 @@ function clasificarPerfil(l) {
   // El UNSPSC no dice nada útil. Si el texto es claramente de nuestro
   // rubro, o el comprador es un organismo ambiental y hay al menos una
   // señal, no se pierde: va a REVISAR.
-  if (fuerte.length >= 2) return { v: 'revisar', motivo: `texto: ${fuerte.slice(0,3).join(', ')}` };
+  // v3: un término núcleo basta (antes se necesitaban 2 fuertes).
+  if (fuerte.length >= 2 || fuerte.some(k => PERFIL.ctx_nucleo.includes(k)))
+    return { v: 'revisar', motivo: `texto: ${fuerte.slice(0,3).join(', ')}` };
   if (compAmb && (fuerte.length || debil.length >= 2))
     return { v: 'revisar', motivo: `comprador ambiental + ${[...fuerte, ...debil].slice(0,2).join(', ')}` };
 
