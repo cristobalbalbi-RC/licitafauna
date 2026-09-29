@@ -1,5 +1,5 @@
 {
-  "actualizado": 1790693617633,
+  "actualizado": 1790693648259,
   "lics": {
     "1301-1-LE26": {
       "robles": true,
@@ -128202,6 +128202,114 @@
       "robles": false,
       "estado": "Publicada",
       "ts": 1790693615565,
+      "fv": 3
+    },
+    "879-16-E226": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693616613,
+      "fv": 3
+    },
+    "881697-1-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693618773,
+      "fv": 3
+    },
+    "898-195-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693622572,
+      "fv": 3
+    },
+    "899-43-LR26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693623656,
+      "fv": 3
+    },
+    "906973-9-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693625780,
+      "fv": 3
+    },
+    "948354-143-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693628865,
+      "fv": 3
+    },
+    "948354-144-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693630697,
+      "fv": 3
+    },
+    "948354-145-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693631547,
+      "fv": 3
+    },
+    "948354-146-LP26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693633188,
+      "fv": 3
+    },
+    "948355-76-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693634575,
+      "fv": 3
+    },
+    "948355-77-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693635561,
+      "fv": 3
+    },
+    "951-5-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693637632,
+      "fv": 3
+    },
+    "953-18-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693638699,
+      "fv": 3
+    },
+    "960854-2-L126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693639828,
+      "fv": 3
+    },
+    "966131-62-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693641793,
+      "fv": 3
+    },
+    "976-19-O126": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693643562,
+      "fv": 3
+    },
+    "979-62-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693644595,
+      "fv": 3
+    },
+    "983344-12-LE26": {
+      "robles": false,
+      "estado": "Publicada",
+      "ts": 1790693645678,
       "fv": 3
     }
   }
